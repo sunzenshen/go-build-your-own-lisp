@@ -2,13 +2,6 @@
 #define mpc_interface_h
 
 #include "mpc.h"
-/* CHEAP HACK ALERT!
- * I know that including the c file is a terrible idea, but I've been spending
- * an embarrassing amount of time trying to figure out why cgo won't link the
- * "undefined" symbols from that file. I'll fix this once my subconscious
- * discovers my bone-headed omission, or when I break down and ask for help.
- */
-#include "mpc.c"
 
 inline mpc_err_t* get_error(mpc_result_t* result)
 {
