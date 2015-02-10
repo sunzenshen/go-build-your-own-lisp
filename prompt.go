@@ -10,7 +10,7 @@ import (
 
 func main() {
 	// Version and Exit Information
-	fmt.Println("Lispy Version 0.0.0.0.2")
+	fmt.Println("Lispy Version 0.0.0.0.3")
 	fmt.Print("Press Ctrl+c to Exit\n\n")
 	// For reading lines of user input
 	scanner := bufio.NewScanner(os.Stdin)
@@ -25,6 +25,6 @@ func main() {
 		scanner.Scan()
 		input := scanner.Text()
 		// Echo input back to user
-		golispy.ParseInput(input, Lispy)
+		golispy.ReadEvalPrint(input, Lispy)
 	}
 }

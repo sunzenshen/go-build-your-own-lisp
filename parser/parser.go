@@ -3,13 +3,65 @@ package golispy
 // #cgo LDFLAGS: -ledit -lm
 // #include "mpc_interface.h"
 import "C"
-import "unsafe"
+import (
+	"fmt"
+	"strconv"
+	"strings"
+	"unsafe"
+)
 
 func CleanLispy(number *C.struct_mpc_parser_t,
 	operator *C.struct_mpc_parser_t,
 	expr *C.struct_mpc_parser_t,
 	lispy *C.struct_mpc_parser_t) {
 	defer C.mpc_cleanup_if(C.int(4), number, operator, expr, lispy)
+}
+
+func Eval(tree *C.mpc_ast_t) int64 {
+	if strings.Contains(getTag(tree), "number") {
+		num, _ := strconv.ParseInt(getContents(tree), 10, 0)
+		return num
+	}
+	op := getOperator(tree)
+	x := Eval(getChild(tree, 2))
+	i := 3
+	for strings.Contains(getTag(getChild(tree, i)), "expr") {
+		x = evalOp(x, op, Eval(getChild(tree, i)))
+		i++
+	}
+	return x
+}
+
+func evalOp(x int64, op string, y int64) int64 {
+	if strings.Contains(op, "+") {
+		return x + y
+	}
+	if strings.Contains(op, "-") {
+		return x - y
+	}
+	if strings.Contains(op, "*") {
+		return x * y
+	}
+	if strings.Contains(op, "/") {
+		return x / y
+	}
+	return 0
+}
+
+func getChild(node *C.mpc_ast_t, index int) *C.mpc_ast_t {
+	return C.get_child(node, C.int(index))
+}
+
+func getContents(node *C.mpc_ast_t) string {
+	return C.GoString(node.contents)
+}
+
+func getOperator(node *C.mpc_ast_t) string {
+	return getContents(getChild(node, 1))
+}
+
+func getTag(node *C.mpc_ast_t) string {
+	return C.GoString(node.tag)
 }
 
 func InitLispy() (
@@ -48,6 +100,21 @@ func ParseInput(input string, mpcParser *C.struct_mpc_parser_t) {
 	defer C.free(unsafe.Pointer(stdin))
 	if C.mpc_parse(stdin, cInput, mpcParser, &r) != C.int(0) {
 		C.mpc_ast_print(C.get_output(&r))
+		C.mpc_ast_delete(C.get_output(&r))
+	} else {
+		C.mpc_err_print(C.get_error(&r))
+		C.mpc_err_delete(C.get_error(&r))
+	}
+}
+
+func ReadEvalPrint(input string, mpcParser *C.struct_mpc_parser_t) {
+	var r C.mpc_result_t
+	cInput := C.CString(input)
+	defer C.free(unsafe.Pointer(cInput))
+	stdin := C.CString("<stdin>")
+	defer C.free(unsafe.Pointer(stdin))
+	if C.mpc_parse(stdin, cInput, mpcParser, &r) != C.int(0) {
+		fmt.Println(Eval(C.get_output(&r)))
 		C.mpc_ast_delete(C.get_output(&r))
 	} else {
 		C.mpc_err_print(C.get_error(&r))

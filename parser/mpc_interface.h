@@ -3,6 +3,11 @@
 
 #include "mpc.h"
 
+inline mpc_ast_t* get_child(mpc_ast_t* node, int index)
+{
+  return node->children[index]; // index into double pointer
+}
+
 inline mpc_err_t* get_error(mpc_result_t* result)
 {
   return (result == NULL) ? NULL : result->error;
