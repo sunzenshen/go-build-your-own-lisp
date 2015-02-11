@@ -1,4 +1,4 @@
-package golispy
+package mpcinterface
 
 // #cgo LDFLAGS: -ledit -lm
 // #include "mpc_interface.h"
