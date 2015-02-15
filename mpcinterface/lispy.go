@@ -7,9 +7,14 @@ import (
 	"strings"
 )
 
+// Lispy is a collection of the Lispy parser definitions
+type Lispy struct {
+	number, operator, expr, Lispy MpcParser
+}
+
 // CleanLispy is used after parsers initiated by InitLispy are not longer to be used
-func CleanLispy(number MpcParser, operator MpcParser, expr MpcParser, lispy MpcParser) {
-	MpcCleanup(number, operator, expr, lispy)
+func CleanLispy(l Lispy) {
+	MpcCleanup(l.number, l.operator, l.expr, l.Lispy)
 }
 
 // Eval translates an AST into the final result of the represented instructions
@@ -45,18 +50,23 @@ func evalOp(x int64, op string, y int64) int64 {
 }
 
 // InitLispy returns the parsers for the Lispy language definition
-func InitLispy() (MpcParser, MpcParser, MpcParser, MpcParser) {
-	Number := mpcNew("number")
-	Operator := mpcNew("operator")
-	Expr := mpcNew("expr")
-	Lispy := mpcNew("lispy")
+func InitLispy() Lispy {
+	number := mpcNew("number")
+	operator := mpcNew("operator")
+	expr := mpcNew("expr")
+	lispy := mpcNew("lispy")
 	language := "" +
 		"number : /-?[0-9]+/                               ; " +
 		"operator : '+' | '-' | '*' | '/'                  ; " +
 		"expr     : <number> | '(' <operator> <expr>+ ')'  ; " +
 		"lispy    : /^/ <operator> <expr>+ /$/             ; "
-	MpcaLang(language, Number, Operator, Expr, Lispy)
-	return Number, Operator, Expr, Lispy
+	MpcaLang(language, number, operator, expr, lispy)
+	parserSet := Lispy{}
+	parserSet.number = number
+	parserSet.operator = operator
+	parserSet.expr = expr
+	parserSet.Lispy = lispy
+	return parserSet
 }
 
 // ReadEval takes a string, tries to interpret it in Lispy

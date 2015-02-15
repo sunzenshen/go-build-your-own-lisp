@@ -15,8 +15,8 @@ func main() {
 	// For reading lines of user input
 	scanner := bufio.NewScanner(os.Stdin)
 
-	Number, Operator, Expr, Lispy := mpcinterface.InitLispy()
-	defer mpcinterface.CleanLispy(Number, Operator, Expr, Lispy)
+	lispy := mpcinterface.InitLispy()
+	defer mpcinterface.CleanLispy(lispy)
 
 	for {
 		// Prompt
@@ -25,6 +25,6 @@ func main() {
 		scanner.Scan()
 		input := scanner.Text()
 		// Echo input back to user
-		mpcinterface.ReadEvalPrint(input, Lispy)
+		mpcinterface.ReadEvalPrint(input, lispy.Lispy)
 	}
 }
