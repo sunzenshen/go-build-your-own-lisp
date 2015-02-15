@@ -12,11 +12,8 @@ import (
 )
 
 // CleanLispy is used after parsers initiated by InitLispy are not longer to be used
-func CleanLispy(number MpcParser,
-	operator MpcParser,
-	expr MpcParser,
-	lispy MpcParser) {
-	defer C.mpc_cleanup_if(C.int(4), number, operator, expr, lispy)
+func CleanLispy(number MpcParser, operator MpcParser, expr MpcParser, lispy MpcParser) {
+	MpcCleanup(number, operator, expr, lispy)
 }
 
 // Eval translates an AST into the final result of the represented instructions
@@ -62,11 +59,7 @@ func InitLispy() (MpcParser, MpcParser, MpcParser, MpcParser) {
 		"operator : '+' | '-' | '*' | '/'                  ; " +
 		"expr     : <number> | '(' <operator> <expr>+ ')'  ; " +
 		"lispy    : /^/ <operator> <expr>+ /$/             ; "
-	cLanguage := C.CString(language)
-	defer C.free(unsafe.Pointer(cLanguage))
-	C.mpca_lang_if(C.MPCA_LANG_DEFAULT,
-		cLanguage,
-		Number, Operator, Expr, Lispy)
+	MpcaLang(language, Number, Operator, Expr, Lispy)
 	return Number, Operator, Expr, Lispy
 }
 

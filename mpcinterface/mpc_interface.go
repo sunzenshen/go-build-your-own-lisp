@@ -27,6 +27,22 @@ func getTag(node MpcAst) string {
 	return C.GoString(node.tag)
 }
 
+// MpcaLang uses a language definition to generate parsers
+func MpcaLang(language string,
+	parser1 MpcParser,
+	parser2 MpcParser,
+	parser3 MpcParser,
+	parser4 MpcParser) {
+	cLanguage := C.CString(language)
+	defer C.free(unsafe.Pointer(cLanguage))
+	C.mpca_lang_if(C.MPCA_LANG_DEFAULT, cLanguage, parser1, parser2, parser3, parser4)
+}
+
+// MpcCleanup calls mpc's cleanup function indirectly, using a wrapper for the variadic args
+func MpcCleanup(parser1 MpcParser, parser2 MpcParser, parser3 MpcParser, parser4 MpcParser) {
+	C.mpc_cleanup_if(C.int(4), parser1, parser2, parser3, parser4)
+}
+
 func mpcNew(name string) MpcParser {
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))
