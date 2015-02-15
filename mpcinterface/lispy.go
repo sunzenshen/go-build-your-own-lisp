@@ -68,7 +68,7 @@ func ReadEval(input string, mpcParser MpcParser) (int64, error) {
 	if err != nil {
 		return 0, errors.New("mpc: ReadEval call to MpcParse failed")
 	}
-	defer C.mpc_ast_delete(C.get_output(&r))
+	defer MpcAstDelete(&r)
 	return Eval(C.get_output(&r)), nil
 }
 
@@ -80,6 +80,6 @@ func ReadEvalPrint(input string, mpcParser MpcParser) {
 		C.mpc_err_delete(C.get_error(&r))
 	} else {
 		fmt.Println(Eval(C.get_output(&r)))
-		C.mpc_ast_delete(C.get_output(&r))
+		MpcAstDelete(&r)
 	}
 }

@@ -33,6 +33,11 @@ func getTag(node MpcAst) string {
 	return C.GoString(node.tag)
 }
 
+// MpcAstDelete cleans up an AST contained in a MpcResult
+func MpcAstDelete(result *C.mpc_result_t) {
+	C.mpc_ast_delete(C.get_output(result))
+}
+
 // MpcaLang uses a language definition to generate parsers
 func MpcaLang(language string,
 	parser1 MpcParser,
@@ -77,6 +82,6 @@ func PrintAst(input string, mpcParser MpcParser) {
 		C.mpc_err_delete(C.get_error(&r))
 	} else {
 		C.mpc_ast_print(C.get_output(&r))
-		C.mpc_ast_delete(C.get_output(&r))
+		MpcAstDelete(&r)
 	}
 }
