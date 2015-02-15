@@ -79,11 +79,16 @@ func MpcParse(input string, parser MpcParser) (C.mpc_result_t, error) {
 	return r, err
 }
 
+// MpcErrPrint prints the reason for failed AST parsing
+func MpcErrPrint(result *C.mpc_result_t) {
+	C.mpc_err_print(C.get_error(result))
+}
+
 // PrintAst parses an input string for its AST representation
 func PrintAst(input string, mpcParser MpcParser) {
 	r, err := MpcParse(input, mpcParser)
 	if err != nil {
-		C.mpc_err_print(C.get_error(&r))
+		MpcErrPrint(&r)
 		C.mpc_err_delete(C.get_error(&r))
 	} else {
 		C.mpc_ast_print(C.get_output(&r))

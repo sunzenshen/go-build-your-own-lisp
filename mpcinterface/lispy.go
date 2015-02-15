@@ -76,7 +76,7 @@ func ReadEval(input string, mpcParser MpcParser) (int64, error) {
 func ReadEvalPrint(input string, mpcParser MpcParser) {
 	r, err := MpcParse(input, mpcParser)
 	if err != nil {
-		C.mpc_err_print(C.get_error(&r))
+		MpcErrPrint(&r)
 		C.mpc_err_delete(C.get_error(&r))
 	} else {
 		fmt.Println(Eval(C.get_output(&r)))
