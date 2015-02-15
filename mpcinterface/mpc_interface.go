@@ -29,6 +29,11 @@ func getOperator(node MpcAst) string {
 	return getContents(getChild(node, 1))
 }
 
+// GetOutput accesses the output field of an input MpcResult
+func GetOutput(result *C.mpc_result_t) MpcAst {
+	return C.get_output(result)
+}
+
 func getTag(node MpcAst) string {
 	return C.GoString(node.tag)
 }

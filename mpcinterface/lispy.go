@@ -69,7 +69,7 @@ func ReadEval(input string, mpcParser MpcParser) (int64, error) {
 		return 0, errors.New("mpc: ReadEval call to MpcParse failed")
 	}
 	defer MpcAstDelete(&r)
-	return Eval(C.get_output(&r)), nil
+	return Eval(GetOutput(&r)), nil
 }
 
 // ReadEvalPrint takes a string, tries to interpret it in Lispy, or returns an parsing error
