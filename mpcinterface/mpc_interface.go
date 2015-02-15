@@ -27,6 +27,7 @@ func mpcNew(name string) *C.struct_mpc_parser_t {
 	return C.mpc_new(cName)
 }
 
+// ParseInput prints the AST of an input string and parser
 func ParseInput(input string, mpcParser *C.struct_mpc_parser_t) {
 	var r C.mpc_result_t
 	cInput := C.CString(input)
