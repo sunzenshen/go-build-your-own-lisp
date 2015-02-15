@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"unsafe"
 )
 
 // CleanLispy is used after parsers initiated by InitLispy are not longer to be used
@@ -65,30 +64,22 @@ func InitLispy() (MpcParser, MpcParser, MpcParser, MpcParser) {
 
 // ReadEval takes a string, tries to interpret it in Lispy
 func ReadEval(input string, mpcParser MpcParser) (int64, error) {
-	var r C.mpc_result_t
-	cInput := C.CString(input)
-	defer C.free(unsafe.Pointer(cInput))
-	stdin := C.CString("<stdin>")
-	defer C.free(unsafe.Pointer(stdin))
-	if C.mpc_parse(stdin, cInput, mpcParser, &r) != C.int(0) {
-		defer C.mpc_ast_delete(C.get_output(&r))
-		return Eval(C.get_output(&r)), nil
+	r, err := MpcParse(input, mpcParser)
+	if err != nil {
+		return 0, errors.New("mpc: ReadEval call to MpcParse failed")
 	}
-	return 0, errors.New("mpc: failed to parse input string")
+	defer C.mpc_ast_delete(C.get_output(&r))
+	return Eval(C.get_output(&r)), nil
 }
 
 // ReadEvalPrint takes a string, tries to interpret it in Lispy, or returns an parsing error
 func ReadEvalPrint(input string, mpcParser MpcParser) {
-	var r C.mpc_result_t
-	cInput := C.CString(input)
-	defer C.free(unsafe.Pointer(cInput))
-	stdin := C.CString("<stdin>")
-	defer C.free(unsafe.Pointer(stdin))
-	if C.mpc_parse(stdin, cInput, mpcParser, &r) != C.int(0) {
-		fmt.Println(Eval(C.get_output(&r)))
-		C.mpc_ast_delete(C.get_output(&r))
-	} else {
+	r, err := MpcParse(input, mpcParser)
+	if err != nil {
 		C.mpc_err_print(C.get_error(&r))
 		C.mpc_err_delete(C.get_error(&r))
+	} else {
+		fmt.Println(Eval(C.get_output(&r)))
+		C.mpc_ast_delete(C.get_output(&r))
 	}
 }

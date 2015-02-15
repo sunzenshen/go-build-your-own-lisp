@@ -3,13 +3,19 @@ package mpcinterface
 // #cgo LDFLAGS: -ledit -lm
 // #include "mpc_interface.h"
 import "C"
-import "unsafe"
+import (
+	"errors"
+	"unsafe"
+)
 
 // MpcAst is a pointer to a mpc-generated AST
 type MpcAst *C.mpc_ast_t
 
 // MpcParser is a pointer to a parser created with mpc
 type MpcParser *C.struct_mpc_parser_t
+
+// MpcResult is a union that returns either an output or error
+type MpcResult C.mpc_result_t
 
 func getChild(node MpcAst, index int) MpcAst {
 	return C.get_child(node, C.int(index))
@@ -49,18 +55,28 @@ func mpcNew(name string) MpcParser {
 	return C.mpc_new(cName)
 }
 
-// ParseInput prints the AST of an input string and parser
-func ParseInput(input string, mpcParser MpcParser) {
+// MpcParse takes an input string and generates an MpcResult
+func MpcParse(input string, parser MpcParser) (C.mpc_result_t, error) {
 	var r C.mpc_result_t
 	cInput := C.CString(input)
 	defer C.free(unsafe.Pointer(cInput))
 	stdin := C.CString("<stdin>")
 	defer C.free(unsafe.Pointer(stdin))
-	if C.mpc_parse(stdin, cInput, mpcParser, &r) != C.int(0) {
-		C.mpc_ast_print(C.get_output(&r))
-		C.mpc_ast_delete(C.get_output(&r))
-	} else {
+	var err error
+	if C.mpc_parse(stdin, cInput, parser, &r) == C.int(0) {
+		err = errors.New("mpc: failed to parse input string")
+	}
+	return r, err
+}
+
+// PrintAst parses an input string for its AST representation
+func PrintAst(input string, mpcParser MpcParser) {
+	r, err := MpcParse(input, mpcParser)
+	if err != nil {
 		C.mpc_err_print(C.get_error(&r))
 		C.mpc_err_delete(C.get_error(&r))
+	} else {
+		C.mpc_ast_print(C.get_output(&r))
+		C.mpc_ast_delete(C.get_output(&r))
 	}
 }
