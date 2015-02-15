@@ -5,19 +5,22 @@ package mpcinterface
 import "C"
 import "unsafe"
 
-func getChild(node *C.mpc_ast_t, index int) *C.mpc_ast_t {
+// MpcAst is a pointer to a mpc-generated AST
+type MpcAst *C.mpc_ast_t
+
+func getChild(node MpcAst, index int) MpcAst {
 	return C.get_child(node, C.int(index))
 }
 
-func getContents(node *C.mpc_ast_t) string {
+func getContents(node MpcAst) string {
 	return C.GoString(node.contents)
 }
 
-func getOperator(node *C.mpc_ast_t) string {
+func getOperator(node MpcAst) string {
 	return getContents(getChild(node, 1))
 }
 
-func getTag(node *C.mpc_ast_t) string {
+func getTag(node MpcAst) string {
 	return C.GoString(node.tag)
 }
 

@@ -20,7 +20,7 @@ func CleanLispy(number *C.struct_mpc_parser_t,
 }
 
 // Eval translates an AST into the final result of the represented instructions
-func Eval(tree *C.mpc_ast_t) int64 {
+func Eval(tree MpcAst) int64 {
 	if strings.Contains(getTag(tree), "number") {
 		num, _ := strconv.ParseInt(getContents(tree), 10, 0)
 		return num
