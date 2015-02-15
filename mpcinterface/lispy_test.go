@@ -11,6 +11,16 @@ func TestValidIntegerMath(t *testing.T) {
 		want  int64
 	}{
 		{"+ 1 1", 2},
+		{"+ 2 -3", -1},
+		{"* -2 -3", 6},
+		{"* 2 3", 6},
+		{"* 2 -3", -6},
+		{"/ 9 3", 3},
+		{"/ -9 3", -3},
+		{"/ -9 -3", 3},
+		{"/ 7 3", 2},
+		{"+ 5 6", 11},
+		{"- (* 10 10) (+ 1 1 1)", 97},
 	}
 	for _, c := range cases {
 		got, err := ReadEval(c.input, Lispy)
