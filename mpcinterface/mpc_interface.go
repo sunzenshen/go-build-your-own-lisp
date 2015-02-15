@@ -8,6 +8,9 @@ import "unsafe"
 // MpcAst is a pointer to a mpc-generated AST
 type MpcAst *C.mpc_ast_t
 
+// MpcParser is a pointer to a parser created with mpc
+type MpcParser *C.struct_mpc_parser_t
+
 func getChild(node MpcAst, index int) MpcAst {
 	return C.get_child(node, C.int(index))
 }
@@ -24,14 +27,14 @@ func getTag(node MpcAst) string {
 	return C.GoString(node.tag)
 }
 
-func mpcNew(name string) *C.struct_mpc_parser_t {
+func mpcNew(name string) MpcParser {
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))
 	return C.mpc_new(cName)
 }
 
 // ParseInput prints the AST of an input string and parser
-func ParseInput(input string, mpcParser *C.struct_mpc_parser_t) {
+func ParseInput(input string, mpcParser MpcParser) {
 	var r C.mpc_result_t
 	cInput := C.CString(input)
 	defer C.free(unsafe.Pointer(cInput))
