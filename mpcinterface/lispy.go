@@ -70,9 +70,13 @@ func InitLispy() Lispy {
 }
 
 // ReadEval takes a string, tries to interpret it in Lispy
-func ReadEval(input string, mpcParser MpcParser) (int64, error) {
+func ReadEval(input string, mpcParser MpcParser, printErrors bool) (int64, error) {
 	r, err := MpcParse(input, mpcParser)
 	if err != nil {
+		if printErrors {
+			MpcErrPrint(&r)
+		}
+		MpcErrDelete(&r)
 		return 0, errors.New("mpc: ReadEval call to MpcParse failed")
 	}
 	defer MpcAstDelete(&r)
@@ -81,12 +85,8 @@ func ReadEval(input string, mpcParser MpcParser) (int64, error) {
 
 // ReadEvalPrint takes a string, tries to interpret it in Lispy, or returns an parsing error
 func ReadEvalPrint(input string, mpcParser MpcParser) {
-	r, err := MpcParse(input, mpcParser)
-	if err != nil {
-		MpcErrPrint(&r)
-		MpcErrDelete(&r)
-	} else {
-		fmt.Println(Eval(GetOutput(&r)))
-		MpcAstDelete(&r)
+	evalResult, err := ReadEval(input, mpcParser, true)
+	if err == nil {
+		fmt.Println(evalResult)
 	}
 }
