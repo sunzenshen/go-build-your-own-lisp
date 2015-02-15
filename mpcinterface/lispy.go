@@ -1,8 +1,5 @@
 package mpcinterface
 
-// #cgo LDFLAGS: -ledit -lm
-// #include "mpc_interface.h"
-import "C"
 import (
 	"errors"
 	"fmt"
@@ -77,9 +74,9 @@ func ReadEvalPrint(input string, mpcParser MpcParser) {
 	r, err := MpcParse(input, mpcParser)
 	if err != nil {
 		MpcErrPrint(&r)
-		C.mpc_err_delete(C.get_error(&r))
+		MpcErrDelete(&r)
 	} else {
-		fmt.Println(Eval(C.get_output(&r)))
+		fmt.Println(Eval(GetOutput(&r)))
 		MpcAstDelete(&r)
 	}
 }
