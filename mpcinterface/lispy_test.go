@@ -13,8 +13,10 @@ func TestValidIntegerMath(t *testing.T) {
 		{"+ 1 1", 2},
 	}
 	for _, c := range cases {
-		got, _ := ReadEval(c.input, Lispy)
-		if got != c.want {
+		got, err := ReadEval(c.input, Lispy)
+		if err != nil {
+			t.Errorf("ReadEval could not parse the following input: \"%s\"", c.input)
+		} else if got != c.want {
 			t.Errorf("ReadEval input: \"%s\" returned: %d, actually expected: %d", c.input, got, c.want)
 		}
 	}

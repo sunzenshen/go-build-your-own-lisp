@@ -4,6 +4,7 @@ package mpcinterface
 // #include "mpc_interface.h"
 import "C"
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -70,7 +71,7 @@ func InitLispy() (
 	return Number, Operator, Expr, Lispy
 }
 
-func ReadEval(input string, mpcParser *C.struct_mpc_parser_t) (ret int64, success bool) {
+func ReadEval(input string, mpcParser *C.struct_mpc_parser_t) (int64, error) {
 	var r C.mpc_result_t
 	cInput := C.CString(input)
 	defer C.free(unsafe.Pointer(cInput))
@@ -78,10 +79,10 @@ func ReadEval(input string, mpcParser *C.struct_mpc_parser_t) (ret int64, succes
 	defer C.free(unsafe.Pointer(stdin))
 	if C.mpc_parse(stdin, cInput, mpcParser, &r) != C.int(0) {
 		defer C.mpc_ast_delete(C.get_output(&r))
-		return Eval(C.get_output(&r)), true
+		return Eval(C.get_output(&r)), nil
 	}
 	// TODO: return error type
-	return 0, false
+	return 0, errors.New("mpc: failed to parse input string")
 }
 
 func ReadEvalPrint(input string, mpcParser *C.struct_mpc_parser_t) {
