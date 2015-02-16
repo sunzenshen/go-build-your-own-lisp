@@ -36,10 +36,12 @@ func TestValidIntegerMath(t *testing.T) {
 		{"- (* 10 10) (+ 1 1 1)", 97},
 	}
 	for _, c := range cases {
-		got, err := l.ReadEval(c.input, false)
-		if err != nil {
-			t.Errorf("ReadEval could not parse the following input: \"%s\"", c.input)
-		} else if got.num != c.want {
+		got := l.ReadEval(c.input, false)
+		if got.ltype != lvalNumType {
+			t.Errorf("ReadEval input: \"%s\" returned ltype %s, err %s actually expected lvalNumType",
+				c.input, ltypeString(got), lerrString(got))
+		}
+		if got.num != c.want {
 			t.Errorf("ReadEval input: \"%s\" returned: %d, actually expected: %d", c.input, got, c.want)
 		}
 	}
@@ -55,13 +57,12 @@ func TestDivisionByZero(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		got, err := l.ReadEval(c, false)
-		if err != nil {
-			t.Errorf("ReadEval failed to parse input: \"%s\"", c)
-		} else if got.ltype != lvalErrType {
-			t.Errorf("ReadEval input: \"%s\" returned ltype %d, actually expected lvalErrType %d", c, got.ltype, lvalErrType)
-		} else if got.err != lerrDivZero {
-			t.Errorf("ReadEval input: \"%s\" returned ltype %d, actually expected lvalErrType %d", c, got.ltype, lvalErrType)
+		got := l.ReadEval(c, false)
+		if got.ltype != lvalErrType {
+			t.Errorf("ReadEval input: \"%s\" returned ltype %s, actually expected lvalErrType", c, ltypeString(got))
+		}
+		if got.err != lerrDivZero {
+			t.Errorf("ReadEval input: \"%s\" returned err %s, actually expected lerrDivZero", c, lerrString(got))
 		}
 	}
 }

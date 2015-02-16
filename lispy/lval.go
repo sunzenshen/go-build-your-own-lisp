@@ -1,6 +1,7 @@
 package lispy
 
 import "fmt"
+import "strconv"
 
 // ltype values for lval
 const (
@@ -17,9 +18,9 @@ const (
 )
 
 type lval struct {
-	ltype int8
+	ltype int
 	num   int64
-	err   int8
+	err   int
 }
 
 // lvalNum creates an lval number
@@ -31,7 +32,7 @@ func lvalNum(x int64) lval {
 }
 
 // lvalErr creates an lval error
-func lvalErr(x int8) lval {
+func lvalErr(x int) lval {
 	var v lval
 	v.ltype = lvalErrType
 	v.err = x
@@ -58,4 +59,28 @@ func lvalPrint(v lval) {
 func lvalPrintLn(v lval) {
 	lvalPrint(v)
 	fmt.Print("\n")
+}
+
+func ltypeString(v lval) string {
+	switch v.ltype {
+	case lvalNumType:
+		return "lvalNumType"
+	case lvalErrType:
+		return "lvalErrType"
+	}
+	return strconv.Itoa(v.ltype)
+}
+
+func lerrString(v lval) string {
+	switch v.err {
+	case lerrDivZero:
+		return "lerrDivZero"
+	case lerrBadOp:
+		return "lerrBadOp"
+	case lerrBadNum:
+		return "lerrBadNum"
+	case lerrParseFail:
+		return "lerrParseFail"
+	}
+	return strconv.Itoa(v.ltype)
 }

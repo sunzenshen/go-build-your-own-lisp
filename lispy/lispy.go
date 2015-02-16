@@ -1,7 +1,6 @@
 package lispy
 
 import (
-	"errors"
 	"math/big"
 	"strconv"
 	"strings"
@@ -98,23 +97,21 @@ func (l *Lispy) PrintAst(input string) {
 }
 
 // ReadEval takes a string, tries to interpret it in Lispy
-func (l *Lispy) ReadEval(input string, printErrors bool) (lval, error) {
+func (l *Lispy) ReadEval(input string, printErrors bool) lval {
 	r, err := mpc.MpcParse(input, l.lispyParser)
 	if err != nil {
 		if printErrors {
 			mpc.MpcErrPrint(&r)
 		}
 		mpc.MpcErrDelete(&r)
-		return lvalErr(lerrParseFail), errors.New("mpc: ReadEval call to MpcParse failed")
+		return lvalErr(lerrParseFail)
 	}
 	defer mpc.MpcAstDelete(&r)
-	return Eval(mpc.GetOutput(&r)), nil
+	return Eval(mpc.GetOutput(&r))
 }
 
 // ReadEvalPrint takes a string, tries to interpret it in Lispy, or returns an parsing error
 func (l *Lispy) ReadEvalPrint(input string) {
-	evalResult, err := l.ReadEval(input, true)
-	if err == nil {
-		lvalPrintLn(evalResult)
-	}
+	evalResult := l.ReadEval(input, true)
+	lvalPrintLn(evalResult)
 }
