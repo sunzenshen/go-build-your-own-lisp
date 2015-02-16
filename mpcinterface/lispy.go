@@ -3,6 +3,7 @@ package mpcinterface
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"strconv"
 	"strings"
 )
@@ -49,6 +50,11 @@ func evalOp(x int64, op string, y int64) int64 {
 	if strings.Contains(op, "%") {
 		return x % y
 	}
+	if strings.Contains(op, "^") {
+		z := big.NewInt(0)
+		z.Exp(big.NewInt(x), big.NewInt(y), nil)
+		return z.Int64()
+	}
 	return 0
 }
 
@@ -60,7 +66,7 @@ func InitLispy() Lispy {
 	lispy := mpcNew("lispy")
 	language := "" +
 		"number : /-?[0-9]+/                               ; " +
-		"operator : '+' | '-' | '*' | '/' | '%'            ; " +
+		"operator : '+' | '-' | '*' | '/' | '%' | '^'      ; " +
 		"expr     : <number> | '(' <operator> <expr>+ ')'  ; " +
 		"lispy    : /^/ <operator> <expr>+ /$/             ; "
 	MpcaLang(language, number, operator, expr, lispy)
