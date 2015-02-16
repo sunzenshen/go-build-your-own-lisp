@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sunzenshen/golispy/mpcinterface"
+	"github.com/sunzenshen/golispy/lispy"
 )
 
 func main() {
@@ -15,8 +15,8 @@ func main() {
 	// For reading lines of user input
 	scanner := bufio.NewScanner(os.Stdin)
 
-	lispy := mpcinterface.InitLispy()
-	defer mpcinterface.CleanLispy(lispy)
+	l := lispy.InitLispy()
+	defer lispy.CleanLispy(l)
 
 	for {
 		// Prompt
@@ -25,6 +25,6 @@ func main() {
 		scanner.Scan()
 		input := scanner.Text()
 		// Echo input back to user
-		lispy.ReadEvalPrint(input)
+		l.ReadEvalPrint(input)
 	}
 }

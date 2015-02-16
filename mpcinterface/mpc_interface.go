@@ -17,16 +17,19 @@ type MpcParser *C.struct_mpc_parser_t
 // MpcResult is a union that returns either an output or error
 type MpcResult C.mpc_result_t
 
-func getChild(node MpcAst, index int) MpcAst {
+// GetChild accesses the child at a specific index in MpcAst
+func GetChild(node MpcAst, index int) MpcAst {
 	return C.get_child(node, C.int(index))
 }
 
-func getContents(node MpcAst) string {
+// GetContents accesses the contents of an MpcAst
+func GetContents(node MpcAst) string {
 	return C.GoString(node.contents)
 }
 
-func getOperator(node MpcAst) string {
-	return getContents(getChild(node, 1))
+// GetOperator accesses a MpcAst's child node representing an operator
+func GetOperator(node MpcAst) string {
+	return GetContents(GetChild(node, 1))
 }
 
 // GetOutput accesses the output field of an input MpcResult
@@ -34,7 +37,8 @@ func GetOutput(result *C.mpc_result_t) MpcAst {
 	return C.get_output(result)
 }
 
-func getTag(node MpcAst) string {
+// GetTag accesses the tag field of an MpcAst
+func GetTag(node MpcAst) string {
 	return C.GoString(node.tag)
 }
 
@@ -59,7 +63,8 @@ func MpcCleanup(parser1 MpcParser, parser2 MpcParser, parser3 MpcParser, parser4
 	C.mpc_cleanup_if(C.int(4), parser1, parser2, parser3, parser4)
 }
 
-func mpcNew(name string) MpcParser {
+// MpcNew returns a pointer to an initiated mpc parser
+func MpcNew(name string) MpcParser {
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))
 	return C.mpc_new(cName)

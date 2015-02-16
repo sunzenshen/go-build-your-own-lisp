@@ -1,10 +1,10 @@
-package mpcinterface
+package lispy
 
 import "testing"
 
 func TestValidIntegerMath(t *testing.T) {
-	lispy := InitLispy()
-	defer CleanLispy(lispy)
+	l := InitLispy()
+	defer CleanLispy(l)
 
 	cases := []struct {
 		input string
@@ -36,7 +36,7 @@ func TestValidIntegerMath(t *testing.T) {
 		{"- (* 10 10) (+ 1 1 1)", 97},
 	}
 	for _, c := range cases {
-		got, err := lispy.ReadEval(c.input, false)
+		got, err := l.ReadEval(c.input, false)
 		if err != nil {
 			t.Errorf("ReadEval could not parse the following input: \"%s\"", c.input)
 		} else if got != c.want {
