@@ -25,6 +25,6 @@ func main() {
 		scanner.Scan()
 		input := scanner.Text()
 		// Echo input back to user
-		mpcinterface.ReadEvalPrint(input, lispy.Lispy)
+		lispy.ReadEvalPrint(input)
 	}
 }

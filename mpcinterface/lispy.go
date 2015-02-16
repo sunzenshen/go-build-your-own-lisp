@@ -9,12 +9,12 @@ import (
 
 // Lispy is a collection of the Lispy parser definitions
 type Lispy struct {
-	number, operator, expr, Lispy MpcParser
+	numberParser, operatorParser, exprParser, lispyParser MpcParser
 }
 
 // CleanLispy is used after parsers initiated by InitLispy are not longer to be used
 func CleanLispy(l Lispy) {
-	MpcCleanup(l.number, l.operator, l.expr, l.Lispy)
+	MpcCleanup(l.numberParser, l.operatorParser, l.exprParser, l.lispyParser)
 }
 
 // Eval translates an AST into the final result of the represented instructions
@@ -62,16 +62,16 @@ func InitLispy() Lispy {
 		"lispy    : /^/ <operator> <expr>+ /$/             ; "
 	MpcaLang(language, number, operator, expr, lispy)
 	parserSet := Lispy{}
-	parserSet.number = number
-	parserSet.operator = operator
-	parserSet.expr = expr
-	parserSet.Lispy = lispy
+	parserSet.numberParser = number
+	parserSet.operatorParser = operator
+	parserSet.exprParser = expr
+	parserSet.lispyParser = lispy
 	return parserSet
 }
 
 // ReadEval takes a string, tries to interpret it in Lispy
-func ReadEval(input string, mpcParser MpcParser, printErrors bool) (int64, error) {
-	r, err := MpcParse(input, mpcParser)
+func (l *Lispy) ReadEval(input string, printErrors bool) (int64, error) {
+	r, err := MpcParse(input, l.lispyParser)
 	if err != nil {
 		if printErrors {
 			MpcErrPrint(&r)
@@ -84,8 +84,8 @@ func ReadEval(input string, mpcParser MpcParser, printErrors bool) (int64, error
 }
 
 // ReadEvalPrint takes a string, tries to interpret it in Lispy, or returns an parsing error
-func ReadEvalPrint(input string, mpcParser MpcParser) {
-	evalResult, err := ReadEval(input, mpcParser, true)
+func (l *Lispy) ReadEvalPrint(input string) {
+	evalResult, err := l.ReadEval(input, true)
 	if err == nil {
 		fmt.Println(evalResult)
 	}
