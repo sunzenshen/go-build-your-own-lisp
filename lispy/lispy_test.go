@@ -66,3 +66,14 @@ func TestDivisionByZero(t *testing.T) {
 		}
 	}
 }
+
+func TestFailedParse(t *testing.T) {
+	l := InitLispy()
+	defer CleanLispy(l)
+	c := "The quick brown fox jumps over the very lazy dog."
+	got := l.ReadEval(c, false)
+	if got.ltype != lvalErrType || got.err != lerrParseFail {
+		t.Errorf("ReadEval input: \"%s\" returned ltype %s, num %d, err %s, actually expected lerrParseFail",
+			c, ltypeString(got), got.num, lerrString(got))
+	}
+}
