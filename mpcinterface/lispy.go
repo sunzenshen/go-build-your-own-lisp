@@ -35,22 +35,22 @@ func Eval(tree MpcAst) int64 {
 }
 
 func evalOp(x int64, op string, y int64) int64 {
-	if strings.Contains(op, "+") {
+	if strings.Contains(op, "+") || strings.Contains(op, "add") {
 		return x + y
 	}
-	if strings.Contains(op, "-") {
+	if strings.Contains(op, "-") || strings.Contains(op, "sub") {
 		return x - y
 	}
-	if strings.Contains(op, "*") {
+	if strings.Contains(op, "*") || strings.Contains(op, "mul") {
 		return x * y
 	}
-	if strings.Contains(op, "/") {
+	if strings.Contains(op, "/") || strings.Contains(op, "div") {
 		return x / y
 	}
-	if strings.Contains(op, "%") {
+	if strings.Contains(op, "%") || strings.Contains(op, "mod") {
 		return x % y
 	}
-	if strings.Contains(op, "^") {
+	if strings.Contains(op, "^") || strings.Contains(op, "pow") {
 		z := big.NewInt(0)
 		z.Exp(big.NewInt(x), big.NewInt(y), nil)
 		return z.Int64()
@@ -65,10 +65,11 @@ func InitLispy() Lispy {
 	expr := mpcNew("expr")
 	lispy := mpcNew("lispy")
 	language := "" +
-		"number : /-?[0-9]+/                               ; " +
-		"operator : '+' | '-' | '*' | '/' | '%' | '^'      ; " +
-		"expr     : <number> | '(' <operator> <expr>+ ')'  ; " +
-		"lispy    : /^/ <operator> <expr>+ /$/             ; "
+		"number : /-?[0-9]+/                                                  ; " +
+		"operator :   '+'   |   '-'   |   '*'   |   '/'   |   '%'   |   '^'     " +
+		"         | \"add\" | \"sub\" | \"mul\" | \"div\" | \"mod\" | \"pow\" ; " +
+		"expr     : <number> | '(' <operator> <expr>+ ')'                     ; " +
+		"lispy    : /^/ <operator> <expr>+ /$/                                ; "
 	MpcaLang(language, number, operator, expr, lispy)
 	parserSet := Lispy{}
 	parserSet.numberParser = number
