@@ -79,6 +79,11 @@ func InitLispy() Lispy {
 	return parserSet
 }
 
+// PrintAst prints the AST of a Lispy expression.
+func (l *Lispy) PrintAst(input string) {
+	PrintAst(input, l.lispyParser)
+}
+
 // ReadEval takes a string, tries to interpret it in Lispy
 func (l *Lispy) ReadEval(input string, printErrors bool) (int64, error) {
 	r, err := MpcParse(input, l.lispyParser)
