@@ -2,7 +2,6 @@ package lispy
 
 import (
 	"errors"
-	"fmt"
 	"math/big"
 	"strconv"
 	"strings"
@@ -21,10 +20,13 @@ func CleanLispy(l Lispy) {
 }
 
 // Eval translates an AST into the final result of the represented instructions
-func Eval(tree mpc.MpcAst) int64 {
+func Eval(tree mpc.MpcAst) lval {
 	if strings.Contains(mpc.GetTag(tree), "number") {
-		num, _ := strconv.ParseInt(mpc.GetContents(tree), 10, 0)
-		return num
+		num, err := strconv.ParseInt(mpc.GetContents(tree), 10, 0)
+		if err != nil {
+			return lvalErr(lerrBadNum)
+		}
+		return lvalNum(num)
 	}
 	op := mpc.GetOperator(tree)
 	x := Eval(mpc.GetChild(tree, 2))
@@ -36,28 +38,37 @@ func Eval(tree mpc.MpcAst) int64 {
 	return x
 }
 
-func evalOp(x int64, op string, y int64) int64 {
+func evalOp(x lval, op string, y lval) lval {
+	if x.ltype == lvalErrType {
+		return x
+	}
+	if x.ltype == lvalErrType {
+		return y
+	}
 	if strings.Contains(op, "+") || strings.Contains(op, "add") {
-		return x + y
+		return lvalNum(x.num + y.num)
 	}
 	if strings.Contains(op, "-") || strings.Contains(op, "sub") {
-		return x - y
+		return lvalNum(x.num - y.num)
 	}
 	if strings.Contains(op, "*") || strings.Contains(op, "mul") {
-		return x * y
+		return lvalNum(x.num * y.num)
 	}
 	if strings.Contains(op, "/") || strings.Contains(op, "div") {
-		return x / y
+		if y.num == 0 {
+			return lvalErr(lerrDivZero)
+		}
+		return lvalNum(x.num / y.num)
 	}
 	if strings.Contains(op, "%") || strings.Contains(op, "mod") {
-		return x % y
+		return lvalNum(x.num % y.num)
 	}
 	if strings.Contains(op, "^") || strings.Contains(op, "pow") {
 		z := big.NewInt(0)
-		z.Exp(big.NewInt(x), big.NewInt(y), nil)
-		return z.Int64()
+		z.Exp(big.NewInt(x.num), big.NewInt(y.num), nil)
+		return lvalNum(z.Int64())
 	}
-	return 0
+	return lvalErr(lerrBadOp)
 }
 
 // InitLispy returns the parsers for the Lispy language definition
@@ -87,14 +98,14 @@ func (l *Lispy) PrintAst(input string) {
 }
 
 // ReadEval takes a string, tries to interpret it in Lispy
-func (l *Lispy) ReadEval(input string, printErrors bool) (int64, error) {
+func (l *Lispy) ReadEval(input string, printErrors bool) (lval, error) {
 	r, err := mpc.MpcParse(input, l.lispyParser)
 	if err != nil {
 		if printErrors {
 			mpc.MpcErrPrint(&r)
 		}
 		mpc.MpcErrDelete(&r)
-		return 0, errors.New("mpc: ReadEval call to MpcParse failed")
+		return lvalErr(lerrParseFail), errors.New("mpc: ReadEval call to MpcParse failed")
 	}
 	defer mpc.MpcAstDelete(&r)
 	return Eval(mpc.GetOutput(&r)), nil
@@ -104,6 +115,6 @@ func (l *Lispy) ReadEval(input string, printErrors bool) (int64, error) {
 func (l *Lispy) ReadEvalPrint(input string) {
 	evalResult, err := l.ReadEval(input, true)
 	if err == nil {
-		fmt.Println(evalResult)
+		lvalPrintLn(evalResult)
 	}
 }
