@@ -21,7 +21,7 @@ type lval struct {
 	num   int64   // lvalNumType
 	err   string  // lvalErrType
 	sym   string  // lvalSymType
-	cell  []*lval // lvalSexprType
+	cells []*lval // lvalSexprType
 }
 
 // lvalNum creates an lval number
@@ -52,12 +52,12 @@ func lvalSym(s string) *lval {
 func lvalSexpr() *lval {
 	v := new(lval)
 	v.ltype = lvalSexprType
-	v.cell = make([]*lval, 0)
+	v.cells = make([]*lval, 0)
 	return v
 }
 
 func (v *lval) cellCount() int {
-	return len(v.cell)
+	return len(v.cells)
 }
 
 func (v *lval) ltypeString() string {
@@ -101,14 +101,14 @@ func (v *lval) lvalAdd(x *lval) {
 	if x == nil {
 		fmt.Println("ERROR: Failed to add lval, addition is nil")
 	} else {
-		v.cell = append(v.cell, x)
+		v.cells = append(v.cells, x)
 	}
 }
 
 func (v *lval) lvalExprString(openChar string, closeChar string) string {
 	s := openChar
-	for i := 0; i < v.cellCount(); i++ {
-		s += v.cell[i].lvalString()
+	for i, cell := range v.cells {
+		s += cell.lvalString()
 		if i < v.cellCount()-1 {
 			s += " "
 		}
@@ -165,12 +165,12 @@ func lvalRead(tree mpc.MpcAst) *lval {
 
 func (v *lval) lvalEvalSexpr() *lval {
 	// Evaluate children
-	for i := 0; i < v.cellCount(); i++ {
-		v.cell[i] = v.cell[i].lvalEval()
+	for i, cell := range v.cells {
+		v.cells[i] = cell.lvalEval()
 	}
 	// Error checking
-	for i := 0; i < v.cellCount(); i++ {
-		if v.cell[i].ltype == lvalErrType {
+	for i, cell := range v.cells {
+		if cell.ltype == lvalErrType {
 			return v.lvalTake(i)
 		}
 	}
@@ -199,10 +199,10 @@ func (v *lval) lvalEval() *lval {
 }
 
 func (v *lval) lvalPop(i int) *lval {
-	x := v.cell[i]
-	copy(v.cell[i:], v.cell[i+1:])
-	v.cell[len(v.cell)-1] = nil
-	v.cell = v.cell[:len(v.cell)-1]
+	x := v.cells[i]
+	copy(v.cells[i:], v.cells[i+1:])
+	v.cells[len(v.cells)-1] = nil
+	v.cells = v.cells[:len(v.cells)-1]
 	return x
 }
 
@@ -212,8 +212,8 @@ func (v *lval) lvalTake(i int) *lval {
 
 func builtinOp(a *lval, op string) *lval {
 	// Ensure all arguments are numbers
-	for i := 0; i < a.cellCount(); i++ {
-		if a.cell[i].ltype != lvalNumType {
+	for _, cell := range a.cells {
+		if cell.ltype != lvalNumType {
 			return lvalErr("Cannot operate on non-number!")
 		}
 	}
