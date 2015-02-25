@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sunzenshen/golispy/lispy"
+	"github.com/sunzenshen/go-build-your-own-lisp/lispy"
 )
 
 func main() {

@@ -1,6 +1,6 @@
 package lispy
 
-import mpc "github.com/sunzenshen/golispy/mpcinterface"
+import "github.com/sunzenshen/go-build-your-own-lisp/mpc"
 
 // Lispy is a collection of the Lispy parser definitions
 type Lispy struct {

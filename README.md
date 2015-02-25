@@ -1,4 +1,4 @@
-# Build Your Own Lisp (In Go)
+# (Go) Build Your Own Lisp
 
 This repository tracks my progress working through the book [Build Your Own Lisp](http://buildyourownlisp.com) by [Daniel Holden](https://github.com/orangeduck) using the [Go](http://golang.org) programming language.
 

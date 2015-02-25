@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	mpc "github.com/sunzenshen/golispy/mpcinterface"
+	"github.com/sunzenshen/go-build-your-own-lisp/mpc"
 )
 
 // ltype values for lval
