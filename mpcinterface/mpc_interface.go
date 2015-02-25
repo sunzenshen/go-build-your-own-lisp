@@ -17,6 +17,11 @@ type MpcParser *C.struct_mpc_parser_t
 // MpcResult is a union that returns either an output or error
 type MpcResult C.mpc_result_t
 
+// GetNumChildren accesses the children_num of MpcAst
+func GetNumChildren(node MpcAst) int {
+	return int(C.get_children_num(node))
+}
+
 // GetChild accesses the child at a specific index in MpcAst
 func GetChild(node MpcAst, index int) MpcAst {
 	return C.get_child(node, C.int(index))
@@ -52,15 +57,21 @@ func MpcaLang(language string,
 	parser1 MpcParser,
 	parser2 MpcParser,
 	parser3 MpcParser,
-	parser4 MpcParser) {
+	parser4 MpcParser,
+	parser5 MpcParser) {
 	cLanguage := C.CString(language)
 	defer C.free(unsafe.Pointer(cLanguage))
-	C.mpca_lang_if(C.MPCA_LANG_DEFAULT, cLanguage, parser1, parser2, parser3, parser4)
+	C.mpca_lang_if(C.MPCA_LANG_DEFAULT, cLanguage, parser1, parser2, parser3, parser4, parser5)
 }
 
 // MpcCleanup calls mpc's cleanup function indirectly, using a wrapper for the variadic args
-func MpcCleanup(parser1 MpcParser, parser2 MpcParser, parser3 MpcParser, parser4 MpcParser) {
-	C.mpc_cleanup_if(C.int(4), parser1, parser2, parser3, parser4)
+func MpcCleanup(
+	parser1 MpcParser,
+	parser2 MpcParser,
+	parser3 MpcParser,
+	parser4 MpcParser,
+	parser5 MpcParser) {
+	C.mpc_cleanup_if(C.int(5), parser1, parser2, parser3, parser4, parser5)
 }
 
 // MpcNew returns a pointer to an initiated mpc parser
