@@ -13,6 +13,7 @@ const (
 	lvalNumType = iota
 	lvalSymType
 	lvalSexprType
+	lvalQexprType
 	lvalErrType
 )
 
@@ -21,7 +22,7 @@ type lval struct {
 	num   int64   // lvalNumType
 	err   string  // lvalErrType
 	sym   string  // lvalSymType
-	cells []*lval // lvalSexprType
+	cells []*lval // lvalSexprType, lvalQexprType
 }
 
 // lvalNum creates an lval number
@@ -56,6 +57,14 @@ func lvalSexpr() *lval {
 	return v
 }
 
+// lvalQexpr creates an lval Q-expression
+func lvalQexpr() *lval {
+	v := new(lval)
+	v.ltype = lvalQexprType
+	v.cells = make([]*lval, 0)
+	return v
+}
+
 func (v *lval) cellCount() int {
 	return len(v.cells)
 }
@@ -70,6 +79,8 @@ func (v *lval) ltypeString() string {
 		return "lvalSymType"
 	case lvalSexprType:
 		return "lvalSexprType"
+	case lvalQexprType:
+		return "lvalQexprType"
 	}
 	return strconv.Itoa(v.ltype)
 }
@@ -84,6 +95,8 @@ func (v *lval) lvalString() string {
 		return (v.sym)
 	case lvalSexprType:
 		return v.lvalExprString("(", ")")
+	case lvalQexprType:
+		return v.lvalExprString("{", "}")
 	}
 	return fmt.Sprintf("Error: lvalString() unhandled ltype %d", v.ltype)
 }
@@ -143,6 +156,8 @@ func lvalRead(tree mpc.MpcAst) *lval {
 		x = lvalSexpr()
 	} else if strings.Contains(mpc.GetTag(tree), "sexpr") {
 		x = lvalSexpr()
+	} else if strings.Contains(mpc.GetTag(tree), "qexpr") {
+		x = lvalQexpr()
 	}
 	// Fill the cell list with any valid expressions in the children
 	for i := 0; i < mpc.GetNumChildren(tree); i++ {
@@ -159,7 +174,6 @@ func lvalRead(tree mpc.MpcAst) *lval {
 		}
 		strconv.ParseInt(mpc.GetContents(tree), 10, 0)
 	}
-
 	return x
 }
 

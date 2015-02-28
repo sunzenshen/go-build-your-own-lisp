@@ -4,12 +4,12 @@ import "github.com/sunzenshen/go-build-your-own-lisp/mpc"
 
 // Lispy is a collection of the Lispy parser definitions
 type Lispy struct {
-	numberParser, symbolParser, sexprParser, exprParser, lispyParser mpc.MpcParser
+	numberParser, symbolParser, sexprParser, qexprParser, exprParser, lispyParser mpc.MpcParser
 }
 
 // CleanLispy is used after parsers initiated by InitLispy are not longer to be used
 func CleanLispy(l Lispy) {
-	mpc.MpcCleanup(l.numberParser, l.symbolParser, l.sexprParser, l.exprParser, l.lispyParser)
+	mpc.MpcCleanup(l.numberParser, l.symbolParser, l.sexprParser, l.qexprParser, l.exprParser, l.lispyParser)
 }
 
 // InitLispy returns the parsers for the Lispy language definition
@@ -17,19 +17,22 @@ func InitLispy() Lispy {
 	number := mpc.MpcNew("number")
 	symbol := mpc.MpcNew("symbol")
 	sexpr := mpc.MpcNew("sexpr")
+	qexpr := mpc.MpcNew("qexpr")
 	expr := mpc.MpcNew("expr")
 	lispy := mpc.MpcNew("lispy")
 	language := "" +
 		"number : /-?[0-9]+/                                                  ; " +
 		"symbol : '+' | '-' | '*' | '/' | '%' | '^'                           ; " +
 		"sexpr  : '(' <expr>* ')'                                             ; " +
-		"expr   : <number> | <symbol> | <sexpr>                               ; " +
+		"qexpr  : '{' <expr>* '}'                                             ; " +
+		"expr   : <number> | <symbol> | <sexpr> | <qexpr>                     ; " +
 		"lispy  : /^/ <expr>* /$/                                             ; "
-	mpc.MpcaLang(language, number, symbol, sexpr, expr, lispy)
+	mpc.MpcaLang(language, number, symbol, sexpr, qexpr, expr, lispy)
 	parserSet := Lispy{}
 	parserSet.numberParser = number
 	parserSet.symbolParser = symbol
 	parserSet.sexprParser = sexpr
+	parserSet.qexprParser = qexpr
 	parserSet.exprParser = expr
 	parserSet.lispyParser = lispy
 	return parserSet
