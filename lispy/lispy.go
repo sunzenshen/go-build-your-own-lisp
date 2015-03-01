@@ -4,6 +4,7 @@ import "github.com/sunzenshen/go-build-your-own-lisp/mpc"
 
 // Lispy is a collection of the Lispy parser definitions
 type Lispy struct {
+	env                                                                           *lenv
 	numberParser, symbolParser, sexprParser, qexprParser, exprParser, lispyParser mpc.MpcParser
 }
 
@@ -22,21 +23,23 @@ func InitLispy() Lispy {
 	lispy := mpc.MpcNew("lispy")
 	language := "" +
 		"number : /-?[0-9]+/                                                  ; " +
-		"symbol : '+' | '-' | '*' | '/' | '%' | '^'                             " +
-		"       | \"list\" | \"head\" | \"tail\" | \"join\" | \"eval\"        ; " +
+		"symbol : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/                            ; " +
 		"sexpr  : '(' <expr>* ')'                                             ; " +
 		"qexpr  : '{' <expr>* '}'                                             ; " +
 		"expr   : <number> | <symbol> | <sexpr> | <qexpr>                     ; " +
 		"lispy  : /^/ <expr>* /$/                                             ; "
 	mpc.MpcaLang(language, number, symbol, sexpr, qexpr, expr, lispy)
-	parserSet := Lispy{}
-	parserSet.numberParser = number
-	parserSet.symbolParser = symbol
-	parserSet.sexprParser = sexpr
-	parserSet.qexprParser = qexpr
-	parserSet.exprParser = expr
-	parserSet.lispyParser = lispy
-	return parserSet
+	l := Lispy{}
+	l.numberParser = number
+	l.symbolParser = symbol
+	l.sexprParser = sexpr
+	l.qexprParser = qexpr
+	l.exprParser = expr
+	l.lispyParser = lispy
+	// Init environment
+	l.env = lenvNew()
+	l.env.lenvAddBuiltins()
+	return l
 }
 
 // PrintAst prints the AST of a Lispy expression.
@@ -59,13 +62,13 @@ func (l *Lispy) Read(input string, printErrors bool) *lval {
 }
 
 // Eval translates an lval into the final result of the represented instructions
-func (v *lval) Eval() *lval {
-	return v.lvalEval()
+func (v *lval) Eval(e *lenv) *lval {
+	return v.lvalEval(e)
 }
 
 // ReadEval takes a string, tries to interpret it in Lispy
 func (l *Lispy) ReadEval(input string, printErrors bool) *lval {
-	return l.Read(input, printErrors).Eval()
+	return l.Read(input, printErrors).Eval(l.env)
 }
 
 // ReadEvalPrint takes a string, tries to interpret it in Lispy, and prints the result

@@ -12,17 +12,19 @@ import (
 const (
 	lvalNumType = iota
 	lvalSymType
+	lvalFunType
 	lvalSexprType
 	lvalQexprType
 	lvalErrType
 )
 
 type lval struct {
-	ltype int
-	num   int64   // lvalNumType
-	err   string  // lvalErrType
-	sym   string  // lvalSymType
-	cells []*lval // lvalSexprType, lvalQexprType
+	ltype    int
+	num      int64    // lvalNumType
+	err      string   // lvalErrType
+	sym      string   // lvalSymType
+	function lbuiltin // lvalFunType
+	cells    []*lval  // lvalSexprType, lvalQexprType
 }
 
 // lvalNum creates an lval number
@@ -65,6 +67,14 @@ func lvalQexpr() *lval {
 	return v
 }
 
+// lvalFun creates a function lval
+func lvalFun(function lbuiltin) *lval {
+	v := new(lval)
+	v.ltype = lvalFunType
+	v.function = function
+	return v
+}
+
 func (v *lval) cellCount() int {
 	return len(v.cells)
 }
@@ -93,6 +103,8 @@ func (v *lval) lvalString() string {
 		return ("Error: " + v.err)
 	case lvalSymType:
 		return (v.sym)
+	case lvalFunType:
+		return "<function>"
 	case lvalSexprType:
 		return v.lvalExprString("(", ")")
 	case lvalQexprType:
@@ -108,6 +120,28 @@ func (v *lval) lvalPrint() {
 func (v *lval) lvalPrintLn() {
 	v.lvalPrint()
 	fmt.Print("\n")
+}
+
+func lvalCopy(v *lval) *lval {
+	x := new(lval)
+	x.ltype = v.ltype
+	switch v.ltype {
+	case lvalFunType:
+		x.function = v.function
+	case lvalNumType:
+		x.num = v.num
+	case lvalErrType:
+		x.err = string(v.err)
+	case lvalSymType:
+		x.sym = string(v.sym)
+	case lvalSexprType:
+		fallthrough
+	case lvalQexprType:
+		for _, cell := range v.cells {
+			x.cells = append(x.cells, cell)
+		}
+	}
+	return x
 }
 
 func (v *lval) lvalAdd(x *lval) {
@@ -177,10 +211,10 @@ func lvalRead(tree mpc.MpcAst) *lval {
 	return x
 }
 
-func (v *lval) lvalEvalSexpr() *lval {
+func (v *lval) lvalEvalSexpr(e *lenv) *lval {
 	// Evaluate children
 	for i, cell := range v.cells {
-		v.cells[i] = cell.lvalEval()
+		v.cells[i] = cell.lvalEval(e)
 	}
 	// Error checking
 	for i, cell := range v.cells {
@@ -198,16 +232,19 @@ func (v *lval) lvalEvalSexpr() *lval {
 	}
 	// Ensure first element is a symbol
 	f := v.lvalPop(0)
-	if f.ltype != lvalSymType {
+	if f.ltype != lvalFunType {
 		return lvalErr("S-expression does not start with symbol!")
 	}
-	// Call builtin with operator
-	return builtin(v, f.sym)
+	// Use first element as a function to get result
+	return f.function(e, v)
 }
 
-func (v *lval) lvalEval() *lval {
+func (v *lval) lvalEval(e *lenv) *lval {
+	if v.ltype == lvalSymType {
+		return e.lenvGet(v)
+	}
 	if v.ltype == lvalSexprType {
-		return v.lvalEvalSexpr()
+		return v.lvalEvalSexpr(e)
 	}
 	return v
 }
