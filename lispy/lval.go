@@ -202,7 +202,7 @@ func (v *lval) lvalEvalSexpr() *lval {
 		return lvalErr("S-expression does not start with symbol!")
 	}
 	// Call builtin with operator
-	return builtinOp(v, f.sym)
+	return builtin(v, f.sym)
 }
 
 func (v *lval) lvalEval() *lval {
@@ -257,4 +257,99 @@ func builtinOp(a *lval, op string) *lval {
 		}
 	}
 	return x
+}
+
+func builtinHead(a *lval) *lval {
+	// Check for error conditions
+	if a.cellCount() != 1 {
+		return lvalErr("Function 'head' passed too many arguments!")
+	}
+	if a.cells[0].ltype != lvalQexprType {
+		return lvalErr("Function 'head' passed incorrect types!")
+	}
+	if a.cells[0].cellCount() == 0 {
+		return lvalErr("Function 'head' passed {}!")
+	}
+	// Otherwise, get the head
+	v := a.lvalTake(0)
+	for v.cellCount() > 1 {
+		v.lvalPop(1)
+	}
+	return v
+}
+
+func builtinTail(a *lval) *lval {
+	// Check for error conditions
+	if a.cellCount() != 1 {
+		return lvalErr("Function 'tail' passed too many arguments!")
+	}
+	if a.cells[0].ltype != lvalQexprType {
+		return lvalErr("Function 'tail' passed incorrect types!")
+	}
+	if a.cells[0].cellCount() == 0 {
+		return lvalErr("Function 'tail' passed {}!")
+	}
+	// Otherwise, get the tail
+	v := a.lvalTake(0)
+	v.lvalPop(0)
+	return v
+}
+
+func builtinList(a *lval) *lval {
+	a.ltype = lvalQexprType
+	return a
+}
+
+func builtinEval(a *lval) *lval {
+	if a.cellCount() != 1 {
+		return lvalErr("Function 'eval' passed too many arguments!")
+	}
+	if a.cells[0].ltype != lvalQexprType {
+		return lvalErr("Function 'eval' passed incorrect type!")
+	}
+	x := a.lvalTake(0)
+	x.ltype = lvalSexprType
+	return x.lvalEval()
+}
+
+func builtinJoin(a *lval) *lval {
+	for _, cell := range a.cells {
+		if cell.ltype != lvalQexprType {
+			return lvalErr("Function 'join' passed incorrect type.")
+		}
+	}
+	x := a.lvalPop(0)
+	for a.cellCount() > 0 {
+		x = lvalJoin(x, a.lvalPop(0))
+	}
+	return x
+}
+
+func lvalJoin(x *lval, y *lval) *lval {
+	for y.cellCount() > 0 {
+		x.lvalAdd(y.lvalPop(0))
+	}
+	return x
+}
+
+func builtin(a *lval, function string) *lval {
+	if function == "list" {
+		return builtinList(a)
+	}
+	if function == "head" {
+		return builtinHead(a)
+	}
+	if function == "tail" {
+		return builtinTail(a)
+	}
+	if function == "join" {
+		return builtinJoin(a)
+	}
+	if function == "eval" {
+		return builtinEval(a)
+	}
+	if strings.Contains("+-/*", function) {
+		return builtinOp(a, function)
+	}
+	return lvalErr("Unknown Function!")
 }

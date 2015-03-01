@@ -62,6 +62,30 @@ func TestValidIntegerMath(t *testing.T) {
 	}
 }
 
+func TestQexpr(t *testing.T) {
+	l := InitLispy()
+	defer CleanLispy(l)
+
+	cases := []struct {
+		input string
+		want  string
+	}{
+		{"list 1 2 3 4", "{1 2 3 4}"},
+		{"{head (list 1 2 3 4)}", "{head (list 1 2 3 4)}"},
+		{"eval {head (list 1 2 3 4)}", "{1}"},
+		{"tail {tail tail tail}", "{tail tail}"},
+		{"eval (tail {tail tail {5 6 7}})", "{6 7}"},
+		{"eval (head {(+ 1 2) (+ 10 20)})", "3"},
+	}
+
+	for _, c := range cases {
+		got := l.ReadEval(c.input, false)
+		if got.lvalString() != c.want {
+			t.Errorf("ReadEval input: \"%s\" returned: \"%s\", actually expected: \"%s\"", c.input, got.lvalString(), c.want)
+		}
+	}
+}
+
 func TestError(t *testing.T) {
 	l := InitLispy()
 	defer CleanLispy(l)

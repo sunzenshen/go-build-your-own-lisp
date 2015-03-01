@@ -22,7 +22,8 @@ func InitLispy() Lispy {
 	lispy := mpc.MpcNew("lispy")
 	language := "" +
 		"number : /-?[0-9]+/                                                  ; " +
-		"symbol : '+' | '-' | '*' | '/' | '%' | '^'                           ; " +
+		"symbol : '+' | '-' | '*' | '/' | '%' | '^'                             " +
+		"       | \"list\" | \"head\" | \"tail\" | \"join\" | \"eval\"        ; " +
 		"sexpr  : '(' <expr>* ')'                                             ; " +
 		"qexpr  : '{' <expr>* '}'                                             ; " +
 		"expr   : <number> | <symbol> | <sexpr> | <qexpr>                     ; " +
