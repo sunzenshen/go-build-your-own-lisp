@@ -91,6 +91,35 @@ func TestStringOutput(t *testing.T) {
 	}
 }
 
+func TestVariableAssignments(t *testing.T) {
+	l := InitLispy()
+	defer CleanLispy(l)
+
+	cases := []struct {
+		input string
+		want  string
+	}{
+		{"def {x} 100", "()"},
+		{"def {y} 200", "()"},
+		{"x", "100"},
+		{"y", "200"},
+		{"+ x y", "300"},
+		{"def {a b} 5 6", "()"},
+		{"+ a b", "11"},
+		{"def {arglist} {a b x y}", "()"},
+		{"arglist", "{a b x y}"},
+		{"def arglist 1 2 3 4", "()"},
+		{"list a b x y", "{1 2 3 4}"},
+	}
+
+	for _, c := range cases {
+		got := l.ReadEval(c.input, false)
+		if got.lvalString() != c.want {
+			t.Errorf("ReadEval input: \"%s\" returned: \"%s\", actually expected: \"%s\"", c.input, got.lvalString(), c.want)
+		}
+	}
+}
+
 func TestError(t *testing.T) {
 	l := InitLispy()
 	defer CleanLispy(l)

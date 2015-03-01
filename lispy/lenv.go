@@ -52,6 +52,7 @@ func (e *lenv) lenvAddBuiltin(name string, function lbuiltin) {
 
 func (e *lenv) lenvAddBuiltins() {
 	// List Functions
+	e.lenvAddBuiltin("def", builtinDef)
 	e.lenvAddBuiltin("list", builtinList)
 	e.lenvAddBuiltin("head", builtinHead)
 	e.lenvAddBuiltin("tail", builtinTail)

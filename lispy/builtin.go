@@ -37,6 +37,29 @@ func builtinOp(e *lenv, a *lval, op string) *lval {
 	return x
 }
 
+func builtinDef(e *lenv, a *lval) *lval {
+	if a.cells[0].ltype != lvalQexprType {
+		return lvalErr("Function 'def' passed incorrect type!")
+	}
+	// First argument is symbol list
+	syms := a.cells[0]
+	// Ensure elements of first list are symbols
+	for _, cell := range syms.cells {
+		if cell.ltype != lvalSymType {
+			return lvalErr("Function 'def' cannot define non-symbol")
+		}
+	}
+	// Check for the correct number of symbols and values
+	if syms.cellCount() != a.cellCount()-1 {
+		return lvalErr("Function 'def' cannot define incorrect number of values to symbols")
+	}
+	// Assign copies of values to symbols
+	for i, cell := range syms.cells {
+		e.lenvPut(cell, a.cells[i+1])
+	}
+	return lvalSexpr()
+}
+
 func builtinHead(e *lenv, a *lval) *lval {
 	// Check for error conditions
 	if a.cellCount() != 1 {
