@@ -62,7 +62,7 @@ func TestValidIntegerMath(t *testing.T) {
 	}
 }
 
-func TestQexpr(t *testing.T) {
+func TestStringOutput(t *testing.T) {
 	l := InitLispy()
 	defer CleanLispy(l)
 
@@ -76,6 +76,11 @@ func TestQexpr(t *testing.T) {
 		{"tail {tail tail tail}", "{tail tail}"},
 		{"eval (tail {tail tail {5 6 7}})", "{6 7}"},
 		{"eval (head {(+ 1 2) (+ 10 20)})", "3"},
+		{"eval (head {5 10 11 15})", "5"},
+		{"+", "<function>"},
+		{"eval (head {+ - = - * /})", "<function>"},
+		{"(eval (head {+ - = - * /})) 10 20", "30"},
+		{"hello", "Error: Unbound Symbol!"},
 	}
 
 	for _, c := range cases {
