@@ -36,10 +36,10 @@ func lvalNum(x int64) *lval {
 }
 
 // lvalErr creates an lval error
-func lvalErr(s string) *lval {
+func lvalErr(f string, a ...interface{}) *lval {
 	v := new(lval)
 	v.ltype = lvalErrType
-	v.err = string(s)
+	v.err = fmt.Sprintf(f, a...)
 	return v
 }
 
@@ -79,20 +79,26 @@ func (v *lval) cellCount() int {
 	return len(v.cells)
 }
 
-func (v *lval) ltypeString() string {
-	switch v.ltype {
+func (v *lval) ltypeName() string {
+	return ltypeName(v.ltype)
+}
+
+func ltypeName(i int) string {
+	switch i {
 	case lvalNumType:
-		return "lvalNumType"
+		return "Number"
 	case lvalErrType:
-		return "lvalErrType"
+		return "Error"
 	case lvalSymType:
-		return "lvalSymType"
+		return "Symbol"
+	case lvalFunType:
+		return "Function"
 	case lvalSexprType:
-		return "lvalSexprType"
+		return "S-Expression"
 	case lvalQexprType:
-		return "lvalQexprType"
+		return "Q-Expression"
 	}
-	return strconv.Itoa(v.ltype)
+	return "Unknown:" + strconv.Itoa(i)
 }
 
 func (v *lval) lvalString() string {
@@ -171,7 +177,7 @@ func (v *lval) lvalExprPrint(openChar string, closeChar string) {
 func lvalReadNum(tree mpc.MpcAst) *lval {
 	x, err := strconv.ParseInt(mpc.GetContents(tree), 10, 0)
 	if err != nil {
-		return lvalErr("Invalid Number!")
+		return lvalErr("Invalid Number: %s", mpc.GetContents(tree))
 	}
 	return lvalNum(x)
 }
@@ -233,7 +239,7 @@ func (v *lval) lvalEvalSexpr(e *lenv) *lval {
 	// Ensure first element is a symbol
 	f := v.lvalPop(0)
 	if f.ltype != lvalFunType {
-		return lvalErr("S-expression does not start with symbol!")
+		return lvalErr("S-expression does not start with symbol! got: %s", f.ltypeName())
 	}
 	// Use first element as a function to get result
 	return f.function(e, v)

@@ -54,7 +54,7 @@ func TestValidIntegerMath(t *testing.T) {
 		got := l.ReadEval(c.input, false)
 		if got.ltype != lvalNumType {
 			t.Errorf("ReadEval input: \"%s\" returned ltype %s, err %s actually expected lvalNumType",
-				c.input, got.ltypeString(), got.err)
+				c.input, got.ltypeName(), got.err)
 		}
 		if got.num != c.want {
 			t.Errorf("ReadEval input: \"%s\" returned: %d, actually expected: %d", c.input, got.num, c.want)
@@ -80,7 +80,10 @@ func TestStringOutput(t *testing.T) {
 		{"+", "<function>"},
 		{"eval (head {+ - = - * /})", "<function>"},
 		{"(eval (head {+ - = - * /})) 10 20", "30"},
-		{"hello", "Error: Unbound Symbol!"},
+		{"hello", "Error: Unbound Symbol: 'hello'"},
+		{"+ 1 {5 6 7}", "Error: Cannot operate on non-number: Q-Expression"},
+		{"head {1 2 3} {4 5 6}",
+			"Error: Function 'head' passed too many arguments: ({1 2 3} {4 5 6})"},
 	}
 
 	for _, c := range cases {
@@ -128,16 +131,17 @@ func TestError(t *testing.T) {
 		input, want string
 	}{
 		{"/ 10 0", "Division By Zero!"},
-		{"(/ ())", "Cannot operate on non-number!"},
-		{"(1 2 3)", "S-expression does not start with symbol!"},
-		{"+ - +", "Cannot operate on non-number!"},
-		{"The quick brown fox jumps over the very lazy dog.", "Failed to parse input!"},
+		{"(/ ())", "Cannot operate on non-number: S-Expression"},
+		{"(1 2 3)", "S-expression does not start with symbol! got: Number"},
+		{"+ - +", "Cannot operate on non-number: Function"},
+		{"The quick brown fox jumps over the very lazy dog.",
+			"Failed to parse input: 'The quick brown fox jumps over the very lazy dog.'"},
 	}
 
 	for _, c := range cases {
 		got := l.ReadEval(c.input, false)
 		if got.ltype != lvalErrType {
-			t.Errorf("ReadEval input: \"%s\" returned ltype %s, actually expected lvalErrType", c, got.ltypeString())
+			t.Errorf("ReadEval input: \"%s\" returned ltype %s, actually expected lvalErrType", c, got.ltypeName())
 		}
 		if got.err != c.want {
 			t.Errorf("ReadEval input: \"%s\" returned err \"%s\", actually expected \"%s\"", c, got.err, c.want)

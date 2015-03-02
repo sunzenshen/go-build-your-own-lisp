@@ -6,7 +6,7 @@ func builtinOp(e *lenv, a *lval, op string) *lval {
 	// Ensure all arguments are numbers
 	for _, cell := range a.cells {
 		if cell.ltype != lvalNumType {
-			return lvalErr("Cannot operate on non-number!")
+			return lvalErr("Cannot operate on non-number: %s", cell.ltypeName())
 		}
 	}
 	// Pop the first element
@@ -39,14 +39,14 @@ func builtinOp(e *lenv, a *lval, op string) *lval {
 
 func builtinDef(e *lenv, a *lval) *lval {
 	if a.cells[0].ltype != lvalQexprType {
-		return lvalErr("Function 'def' passed incorrect type!")
+		return lvalErr("Function 'def' passed incorrect type: %s", a.cells[0].ltypeName())
 	}
 	// First argument is symbol list
 	syms := a.cells[0]
 	// Ensure elements of first list are symbols
 	for _, cell := range syms.cells {
 		if cell.ltype != lvalSymType {
-			return lvalErr("Function 'def' cannot define non-symbol")
+			return lvalErr("Function 'def' cannot define non-symbol: %s", cell.ltypeName())
 		}
 	}
 	// Check for the correct number of symbols and values
@@ -63,10 +63,10 @@ func builtinDef(e *lenv, a *lval) *lval {
 func builtinHead(e *lenv, a *lval) *lval {
 	// Check for error conditions
 	if a.cellCount() != 1 {
-		return lvalErr("Function 'head' passed too many arguments!")
+		return lvalErr("Function 'head' passed too many arguments: %s", a.lvalString())
 	}
 	if a.cells[0].ltype != lvalQexprType {
-		return lvalErr("Function 'head' passed incorrect types!")
+		return lvalErr("Function 'head' passed incorrect types: %s", a.lvalString())
 	}
 	if a.cells[0].cellCount() == 0 {
 		return lvalErr("Function 'head' passed {}!")
@@ -82,10 +82,10 @@ func builtinHead(e *lenv, a *lval) *lval {
 func builtinTail(e *lenv, a *lval) *lval {
 	// Check for error conditions
 	if a.cellCount() != 1 {
-		return lvalErr("Function 'tail' passed too many arguments!")
+		return lvalErr("Function 'tail' passed too many arguments: %s", a.lvalString())
 	}
 	if a.cells[0].ltype != lvalQexprType {
-		return lvalErr("Function 'tail' passed incorrect types!")
+		return lvalErr("Function 'tail' passed incorrect types: %s", a.lvalString())
 	}
 	if a.cells[0].cellCount() == 0 {
 		return lvalErr("Function 'tail' passed {}!")
@@ -103,10 +103,10 @@ func builtinList(e *lenv, a *lval) *lval {
 
 func builtinEval(e *lenv, a *lval) *lval {
 	if a.cellCount() != 1 {
-		return lvalErr("Function 'eval' passed too many arguments!")
+		return lvalErr("Function 'eval' passed too many arguments: %s", a.lvalString())
 	}
 	if a.cells[0].ltype != lvalQexprType {
-		return lvalErr("Function 'eval' passed incorrect type!")
+		return lvalErr("Function 'eval' passed incorrect type: %s", a.lvalString())
 	}
 	x := a.lvalTake(0)
 	x.ltype = lvalSexprType
@@ -116,7 +116,7 @@ func builtinEval(e *lenv, a *lval) *lval {
 func builtinJoin(e *lenv, a *lval) *lval {
 	for _, cell := range a.cells {
 		if cell.ltype != lvalQexprType {
-			return lvalErr("Function 'join' passed incorrect type.")
+			return lvalErr("Function 'join' passed incorrect type: %s", a.lvalString())
 		}
 	}
 	x := a.lvalPop(0)

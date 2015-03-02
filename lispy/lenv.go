@@ -28,7 +28,7 @@ func (e *lenv) lenvGet(k *lval) *lval {
 			return lvalCopy(e.vals[i])
 		}
 	}
-	return lvalErr("Unbound Symbol!")
+	return lvalErr("Unbound Symbol: '%s'", k.sym)
 }
 
 func (e *lenv) lenvPut(k, v *lval) {
