@@ -53,27 +53,17 @@ func MpcAstDelete(result *C.mpc_result_t) {
 }
 
 // MpcaLang uses a language definition to generate parsers
-func MpcaLang(language string,
-	parser1 MpcParser,
-	parser2 MpcParser,
-	parser3 MpcParser,
-	parser4 MpcParser,
-	parser5 MpcParser,
-	parser6 MpcParser) {
+func MpcaLang(language string, parsers ...MpcParser) {
 	cLanguage := C.CString(language)
 	defer C.free(unsafe.Pointer(cLanguage))
-	C.mpca_lang_if(C.MPCA_LANG_DEFAULT, cLanguage, parser1, parser2, parser3, parser4, parser5, parser6)
+	C.mpca_lang_if(C.MPCA_LANG_DEFAULT, cLanguage,
+		parsers[0], parsers[1], parsers[2], parsers[3], parsers[4], parsers[5])
 }
 
 // MpcCleanup calls mpc's cleanup function indirectly, using a wrapper for the variadic args
-func MpcCleanup(
-	parser1 MpcParser,
-	parser2 MpcParser,
-	parser3 MpcParser,
-	parser4 MpcParser,
-	parser5 MpcParser,
-	parser6 MpcParser) {
-	C.mpc_cleanup_if(C.int(6), parser1, parser2, parser3, parser4, parser5, parser6)
+func MpcCleanup(parsers ...MpcParser) {
+	C.mpc_cleanup_if(C.int(len(parsers)),
+		parsers[0], parsers[1], parsers[2], parsers[3], parsers[4], parsers[5])
 }
 
 // MpcNew returns a pointer to an initiated mpc parser
