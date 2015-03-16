@@ -1,6 +1,5 @@
 package mpc
 
-// #cgo LDFLAGS: -ledit -lm
 // #include "mpc_interface.h"
 import "C"
 import (
