@@ -1,4 +1,5 @@
 # (Go) Build Your Own Lisp
+[![Build Status](https://api.travis-ci.org/sunzenshen/go-build-your-own-lisp.png?branch=master)](https://travis-ci.org/sunzenshen/go-build-your-own-lisp)
 
 This repository tracks my progress working through the book [Build Your Own Lisp](http://buildyourownlisp.com) by [Daniel Holden](https://github.com/orangeduck) using the [Go](http://golang.org) programming language.
 
