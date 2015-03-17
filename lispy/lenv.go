@@ -3,12 +3,14 @@ package lispy
 import "fmt"
 
 type lenv struct {
+	par  *lenv
 	syms []string
 	vals []*lval
 }
 
 func lenvNew() *lenv {
 	e := new(lenv)
+	e.par = nil
 	e.syms = nil
 	e.vals = nil
 	return e
@@ -22,11 +24,25 @@ func (e *lenv) count() int {
 	return len(e.syms)
 }
 
+func lenvCopy(e *lenv) *lenv {
+	n := new(lenv)
+	n.par = e.par
+	for i := 0; i < e.count(); i++ {
+		n.syms = append(n.syms, string(e.syms[i]))
+		n.vals = append(n.vals, lvalCopy(e.vals[i]))
+	}
+	return n
+}
+
 func (e *lenv) lenvGet(k *lval) *lval {
-	for i, sym := range e.syms {
-		if sym == k.sym {
+	for i := 0; i < e.count(); i++ {
+		if e.syms[i] == k.sym {
 			return lvalCopy(e.vals[i])
 		}
+	}
+	// If no symbol is found yet, check in the parent
+	if e.par != nil {
+		return e.par.lenvGet(k)
 	}
 	return lvalErr("Unbound Symbol: '%s'", k.sym)
 }
@@ -44,6 +60,15 @@ func (e *lenv) lenvPut(k, v *lval) {
 	e.syms = append(e.syms, k.sym)
 }
 
+func (e *lenv) lenvDef(k *lval, v *lval) {
+	// Find top parent
+	for e.par != nil {
+		e = e.par
+	}
+	// Put value in e
+	e.lenvPut(k, v)
+}
+
 func (e *lenv) lenvAddBuiltin(name string, function lbuiltin) {
 	k := lvalSym(name)
 	v := lvalFun(function)
@@ -53,6 +78,8 @@ func (e *lenv) lenvAddBuiltin(name string, function lbuiltin) {
 func (e *lenv) lenvAddBuiltins() {
 	// List Functions
 	e.lenvAddBuiltin("def", builtinDef)
+	e.lenvAddBuiltin("=", builtinPut)
+	e.lenvAddBuiltin("\\", builtinLambda)
 	e.lenvAddBuiltin("list", builtinList)
 	e.lenvAddBuiltin("head", builtinHead)
 	e.lenvAddBuiltin("tail", builtinTail)

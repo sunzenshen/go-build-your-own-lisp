@@ -38,24 +38,39 @@ func builtinOp(e *lenv, a *lval, op string) *lval {
 }
 
 func builtinDef(e *lenv, a *lval) *lval {
+	return builtinVar(e, a, "def")
+}
+
+func builtinPut(e *lenv, a *lval) *lval {
+	return builtinVar(e, a, "=")
+}
+
+func builtinVar(e *lenv, a *lval, function string) *lval {
 	if a.cells[0].ltype != lvalQexprType {
-		return lvalErr("Function 'def' passed incorrect type: %s", a.cells[0].ltypeName())
+		return lvalErr("Function %s passed incorrect type: %s", function, a.cells[0].ltypeName())
 	}
 	// First argument is symbol list
 	syms := a.cells[0]
 	// Ensure elements of first list are symbols
 	for _, cell := range syms.cells {
 		if cell.ltype != lvalSymType {
-			return lvalErr("Function 'def' cannot define non-symbol: %s", cell.ltypeName())
+			return lvalErr("Function %s cannot define non-symbol: %s", function, cell.ltypeName())
 		}
 	}
 	// Check for the correct number of symbols and values
 	if syms.cellCount() != a.cellCount()-1 {
-		return lvalErr("Function 'def' cannot define incorrect number of values to symbols")
+		return lvalErr("Function %s cannot define incorrect number of values to symbols", function)
 	}
 	// Assign copies of values to symbols
 	for i, cell := range syms.cells {
-		e.lenvPut(cell, a.cells[i+1])
+		// 'def' to define globally
+		if function == "def" {
+			e.lenvDef(cell, a.cells[i+1])
+		}
+		// 'put' to define locally
+		if function == "=" {
+			e.lenvPut(cell, a.cells[i+1])
+		}
 	}
 	return lvalSexpr()
 }
@@ -124,6 +139,26 @@ func builtinJoin(e *lenv, a *lval) *lval {
 		x = lvalJoin(x, a.lvalPop(0))
 	}
 	return x
+}
+
+func builtinLambda(e *lenv, a *lval) *lval {
+	if a.cellCount() != 2 {
+		return lvalErr("Lambda has %d arguments, not 2 as expected", a.cellCount())
+	} else if a.cells[0].ltype != lvalQexprType {
+		return lvalErr("Lambda cell[0] has unexpected type %d", a.cells[0].ltype)
+	} else if a.cells[1].ltype != lvalQexprType {
+		return lvalErr("Lambda cell[1] has unexpected type %d", a.cells[1].ltype)
+	}
+	// Check that the first Q-expression contains only Symbols
+	for _, cell := range a.cells[0].cells {
+		if cell.ltype != lvalSymType {
+			return lvalErr("Cannot define non-symbol. Got type %s instead", cell.ltype)
+		}
+	}
+	// Pop first 2 arguments and pass them to lvalLambda
+	formals := a.lvalPop(0)
+	body := a.lvalPop(0)
+	return lvalLambda(formals, body)
 }
 
 func builtinAdd(e *lenv, a *lval) *lval {

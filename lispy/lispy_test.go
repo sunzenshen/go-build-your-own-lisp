@@ -77,8 +77,8 @@ func TestStringOutput(t *testing.T) {
 		{"eval (tail {tail tail {5 6 7}})", "{6 7}"},
 		{"eval (head {(+ 1 2) (+ 10 20)})", "3"},
 		{"eval (head {5 10 11 15})", "5"},
-		{"+", "<function>"},
-		{"eval (head {+ - = - * /})", "<function>"},
+		{"+", "<builtin>"},
+		{"eval (head {+ - = - * /})", "<builtin>"},
 		{"(eval (head {+ - = - * /})) 10 20", "30"},
 		{"hello", "Error: Unbound Symbol: 'hello'"},
 		{"+ 1 {5 6 7}", "Error: Cannot operate on non-number: Q-Expression"},
@@ -145,6 +145,40 @@ func TestError(t *testing.T) {
 		}
 		if got.err != c.want {
 			t.Errorf("ReadEval input: \"%s\" returned err \"%s\", actually expected \"%s\"", c, got.err, c.want)
+		}
+	}
+}
+
+func TestFunctionDefinitions(t *testing.T) {
+	l := InitLispy()
+	defer CleanLispy(l)
+
+	cases := []struct {
+		input string
+		want  string
+	}{
+		{"(\\ {x y} {+ x y})", "(\\ {x y} {+ x y})"},
+		{"(\\ {x y} {+ x y}) 10 20", "30"},
+		{"def {add-together} (\\ {x y} {+ x y})", "()"},
+		{"add-together", "(\\ {x y} {+ x y})"},
+		{"add-together 10 20", "30"},
+		{"add-together", "(\\ {x y} {+ x y})"}, // Check for accidental modification
+		{"def {add-mul} (\\ {x y} {+ x (* x y)})", "()"},
+		{"add-mul", "(\\ {x y} {+ x (* x y)})"},
+		{"add-mul 10 20", "210"},
+		{"add-mul 10", "(\\ {y} {+ x (* x y)})"},
+		{"def {add-mul-ten} (add-mul 10)", "()"},
+		{"add-mul-ten", "(\\ {y} {+ x (* x y)})"},
+		{"add-mul 10 50", "510"},
+		{"add-mul-ten 50", "510"},
+		{"add-mul", "(\\ {x y} {+ x (* x y)})"},   // Check for accidental modification
+		{"add-mul-ten", "(\\ {y} {+ x (* x y)})"}, // Check for accidental modification
+	}
+
+	for _, c := range cases {
+		got := l.ReadEval(c.input, false)
+		if got.lvalString() != c.want {
+			t.Errorf("ReadEval input: \"%s\" returned: \"%s\", actually expected: \"%s\"", c.input, got.lvalString(), c.want)
 		}
 	}
 }

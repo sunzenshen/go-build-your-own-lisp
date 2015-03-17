@@ -19,12 +19,21 @@ const (
 )
 
 type lval struct {
-	ltype    int
-	num      int64    // lvalNumType
-	err      string   // lvalErrType
-	sym      string   // lvalSymType
-	function lbuiltin // lvalFunType
-	cells    []*lval  // lvalSexprType, lvalQexprType
+	ltype int
+
+	// Basic
+	num int64  // lvalNumType
+	err string // lvalErrType
+	sym string // lvalSymType
+
+	// Function
+	builtin lbuiltin // lvalFunType, nil for user defined function
+	env     *lenv
+	formals *lval
+	body    *lval
+
+	// Expression
+	cells []*lval // lvalSexprType, lvalQexprType
 }
 
 // lvalNum creates an lval number
@@ -71,7 +80,21 @@ func lvalQexpr() *lval {
 func lvalFun(function lbuiltin) *lval {
 	v := new(lval)
 	v.ltype = lvalFunType
-	v.function = function
+	v.builtin = function
+	return v
+}
+
+// lvalLambda creates a user defined lval function
+func lvalLambda(formals *lval, body *lval) *lval {
+	v := new(lval)
+	v.ltype = lvalFunType
+	// Builtin is nil for user defined functions
+	v.builtin = nil
+	// Init environment
+	v.env = lenvNew()
+	// Set formals and body
+	v.formals = formals
+	v.body = body
 	return v
 }
 
@@ -110,7 +133,10 @@ func (v *lval) lvalString() string {
 	case lvalSymType:
 		return (v.sym)
 	case lvalFunType:
-		return "<function>"
+		if v.builtin == nil {
+			return "(\\ " + v.formals.lvalString() + " " + v.body.lvalString() + ")"
+		}
+		return "<builtin>"
 	case lvalSexprType:
 		return v.lvalExprString("(", ")")
 	case lvalQexprType:
@@ -133,7 +159,14 @@ func lvalCopy(v *lval) *lval {
 	x.ltype = v.ltype
 	switch v.ltype {
 	case lvalFunType:
-		x.function = v.function
+		if v.builtin == nil {
+			x.builtin = nil
+			x.env = lenvCopy(v.env)
+			x.formals = lvalCopy(v.formals)
+			x.body = lvalCopy(v.body)
+		} else {
+			x.builtin = v.builtin
+		}
 	case lvalNumType:
 		x.num = v.num
 	case lvalErrType:
@@ -144,18 +177,15 @@ func lvalCopy(v *lval) *lval {
 		fallthrough
 	case lvalQexprType:
 		for _, cell := range v.cells {
-			x.cells = append(x.cells, cell)
+			x.cells = append(x.cells, lvalCopy(cell))
 		}
 	}
 	return x
 }
 
-func (v *lval) lvalAdd(x *lval) {
-	if x == nil {
-		fmt.Println("ERROR: Failed to add lval, addition is nil")
-	} else {
-		v.cells = append(v.cells, x)
-	}
+func lvalAdd(v *lval, x *lval) *lval {
+	v.cells = append(v.cells, x)
+	return v
 }
 
 func (v *lval) lvalExprString(openChar string, closeChar string) string {
@@ -210,7 +240,7 @@ func lvalRead(tree mpc.MpcAst) *lval {
 			mpc.GetTag(iChild) == "regex" {
 			continue
 		} else {
-			x.lvalAdd(lvalRead(iChild))
+			x = lvalAdd(x, lvalRead(iChild))
 		}
 		strconv.ParseInt(mpc.GetContents(tree), 10, 0)
 	}
@@ -234,7 +264,7 @@ func (v *lval) lvalEvalSexpr(e *lenv) *lval {
 	}
 	// Single Expression
 	if v.cellCount() == 1 {
-		return v.lvalTake(0)
+		return v.lvalTake(0).lvalEval(e)
 	}
 	// Ensure first element is a symbol
 	f := v.lvalPop(0)
@@ -242,7 +272,7 @@ func (v *lval) lvalEvalSexpr(e *lenv) *lval {
 		return lvalErr("S-expression does not start with symbol! got: %s", f.ltypeName())
 	}
 	// Use first element as a function to get result
-	return f.function(e, v)
+	return lvalCall(e, f, v)
 }
 
 func (v *lval) lvalEval(e *lenv) *lval {
@@ -269,7 +299,40 @@ func (v *lval) lvalTake(i int) *lval {
 
 func lvalJoin(x *lval, y *lval) *lval {
 	for y.cellCount() > 0 {
-		x.lvalAdd(y.lvalPop(0))
+		x = lvalAdd(x, y.lvalPop(0))
 	}
 	return x
+}
+
+func lvalCall(e *lenv, f *lval, a *lval) *lval {
+	// Simple Builtin case:
+	if f.builtin != nil {
+		return f.builtin(e, a)
+	}
+	// Record argument counts
+	given := a.cellCount()
+	total := f.formals.cellCount()
+	// While arguments still remain to be processed
+	for a.cellCount() > 0 {
+		// If we've ran out of formal arguments to bind
+		if f.formals.cellCount() == 0 {
+			return lvalErr("Function passed too many arguments. Got %d, Expected %d", given, total)
+		}
+		// Pop the first symbol from the formal
+		sym := f.formals.lvalPop(0)
+		// Pop the next argument from the list
+		val := a.lvalPop(0)
+		// Bind a copy into the function's environment
+		f.env.lenvPut(sym, val)
+	}
+	// If all formals have been bound, evaluate
+	if f.formals.cellCount() == 0 {
+		// Set environment parent to evaluation environment
+		f.env.par = e
+		// Evaluate and return
+		ret := builtinEval(f.env, lvalAdd(lvalSexpr(), lvalCopy(f.body)))
+		return ret
+	}
+	// Otherwise, return partially evaluated function
+	return lvalCopy(f)
 }
