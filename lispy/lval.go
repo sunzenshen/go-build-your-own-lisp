@@ -320,9 +320,34 @@ func lvalCall(e *lenv, f *lval, a *lval) *lval {
 		}
 		// Pop the first symbol from the formal
 		sym := f.formals.lvalPop(0)
+		// Special case to deal with '&'
+		if sym.sym == "&" {
+			// Ensure '&' is followed by another symbol
+			if f.formals.cellCount() != 1 {
+				return lvalErr("Function format invalid. Symbol '&' was not followed by 1 symbol.)")
+			}
+			// Next formal should be bound to the remaining arguments
+			nsym := f.formals.lvalPop(0)
+			f.env.lenvPut(nsym, builtinList(e, a))
+			break
+		}
 		// Pop the next argument from the list
 		val := a.lvalPop(0)
 		// Bind a copy into the function's environment
+		f.env.lenvPut(sym, val)
+	}
+	// If '&' remains in the formal list, bind to an empty list
+	if f.formals.cellCount() > 0 && f.formals.cells[0].sym == "&" {
+		// Check to ensure that '&' is not passed in invalidly
+		if f.formals.cellCount() != 2 {
+			return lvalErr("Function forma invalid. Symbol '&' not followed by single symbol")
+		}
+		// Pop '&' symbol
+		f.formals.lvalPop(0)
+		// Pop the next symbol and create an empty list
+		sym := f.formals.lvalPop(0)
+		val := lvalQexpr()
+		// Bind to the environment
 		f.env.lenvPut(sym, val)
 	}
 	// If all formals have been bound, evaluate
@@ -330,8 +355,7 @@ func lvalCall(e *lenv, f *lval, a *lval) *lval {
 		// Set environment parent to evaluation environment
 		f.env.par = e
 		// Evaluate and return
-		ret := builtinEval(f.env, lvalAdd(lvalSexpr(), lvalCopy(f.body)))
-		return ret
+		return builtinEval(f.env, lvalAdd(lvalSexpr(), lvalCopy(f.body)))
 	}
 	// Otherwise, return partially evaluated function
 	return lvalCopy(f)

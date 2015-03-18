@@ -182,3 +182,36 @@ func TestFunctionDefinitions(t *testing.T) {
 		}
 	}
 }
+
+func TestVariableArgsAndCurrying(t *testing.T) {
+	l := InitLispy()
+	defer CleanLispy(l)
+
+	cases := []struct {
+		input string
+		want  string
+	}{
+		{"\\ {args body} {def (head args) (\\ (tail args) body)}",
+			"(\\ {args body} {def (head args) (\\ (tail args) body)})"},
+		{"def {fun} (\\ {args body} {def (head args) (\\ (tail args) body)})", "()"},
+		{"fun {add-together x y} {+ x y}", "()"},
+		{"add-together 1 2", "3"},
+		{"fun {unpack f xs} {eval (join (list f) xs)}", "()"},
+		{"fun {pack f & xs} {f xs}", "()"},
+		{"def {uncurry} pack", "()"},
+		{"def {curry} unpack", "()"},
+		{"curry + {5 6 7}", "18"},
+		{"uncurry head 5 6 7", "{5}"},
+		{"def {add-uncurried} +", "()"},
+		{"def {add-curried} (curry +)", "()"},
+		{"add-curried {5 6 7}", "18"},
+		{"add-uncurried 5 6 7", "18"},
+	}
+
+	for _, c := range cases {
+		got := l.ReadEval(c.input, false)
+		if got.lvalString() != c.want {
+			t.Errorf("ReadEval input: \"%s\" returned: \"%s\", actually expected: \"%s\"", c.input, got.lvalString(), c.want)
+		}
+	}
+}
