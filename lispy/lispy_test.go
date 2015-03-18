@@ -215,3 +215,30 @@ func TestVariableArgsAndCurrying(t *testing.T) {
 		}
 	}
 }
+
+func TestConditionals(t *testing.T) {
+	l := InitLispy()
+	defer CleanLispy(l)
+
+	cases := []struct {
+		input string
+		want  string
+	}{
+		{"> 10 5", "1"},
+		{"<= 88 5", "0"},
+		{"== 5 6", "0"},
+		{"== 5 {}", "0"},
+		{"== 1 1", "1"},
+		{"!= {} 56", "1"},
+		{"== {1 2 3 { 5 6}} {1  2 3  {5 6}}", "1"},
+		{"def {x y} 100 200", "()"},
+		{"if (== x y) {+ x y} {- x y}", "-100"},
+	}
+
+	for _, c := range cases {
+		got := l.ReadEval(c.input, false)
+		if got.lvalString() != c.want {
+			t.Errorf("ReadEval input: \"%s\" returned: \"%s\", actually expected: \"%s\"", c.input, got.lvalString(), c.want)
+		}
+	}
+}

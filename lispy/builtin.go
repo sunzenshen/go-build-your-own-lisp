@@ -161,6 +161,101 @@ func builtinLambda(e *lenv, a *lval) *lval {
 	return lvalLambda(formals, body)
 }
 
+func builtinGreaterThan(e *lenv, a *lval) *lval {
+	return builtinOrd(e, a, ">")
+}
+
+func builtinLessThan(e *lenv, a *lval) *lval {
+	return builtinOrd(e, a, "<")
+}
+
+func builtinGreaterEqual(e *lenv, a *lval) *lval {
+	return builtinOrd(e, a, ">=")
+}
+
+func builtinLessEqual(e *lenv, a *lval) *lval {
+	return builtinOrd(e, a, "<=")
+}
+
+func builtinOrd(e *lenv, a *lval, op string) *lval {
+	if a.cellCount() != 2 {
+		return lvalErr("%s passed in with %d cells not 2", op, a.cellCount())
+	}
+	if a.cells[0].ltype != lvalNumType {
+		return lvalErr("%s cell0 is not a number, but type %s", op, a.cells[0].ltypeName())
+	}
+	if a.cells[1].ltype != lvalNumType {
+		return lvalErr("%s cell1 is not a number, but type %s", op, a.cells[1].ltypeName())
+	}
+	var cmp bool
+	if op == ">" {
+		cmp = a.cells[0].num > a.cells[1].num
+	} else if op == "<" {
+		cmp = a.cells[0].num < a.cells[1].num
+	} else if op == ">=" {
+		cmp = a.cells[0].num >= a.cells[1].num
+	} else if op == "<=" {
+		cmp = a.cells[0].num <= a.cells[1].num
+	}
+	// 0 = false, and everything else is true
+	if cmp {
+		return lvalNum(1)
+	}
+	return lvalNum(0)
+}
+
+func builtinCmp(e *lenv, a *lval, op string) *lval {
+	if a.cellCount() != 2 {
+		return lvalErr("%s passed in with %d args, not 2", op, a.cellCount())
+	}
+	var cmp bool
+	if op == "==" {
+		cmp = lvalEq(a.cells[0], a.cells[1])
+	} else if op == "!=" {
+		cmp = !lvalEq(a.cells[0], a.cells[1])
+	}
+	if cmp {
+		return lvalNum(1)
+	}
+	return lvalNum(0)
+}
+
+func builtinEqual(e *lenv, a *lval) *lval {
+	return builtinCmp(e, a, "==")
+}
+
+func builtinNotEqual(e *lenv, a *lval) *lval {
+	return builtinCmp(e, a, "!=")
+}
+
+func builtinIf(e *lenv, a *lval) *lval {
+	if a.cellCount() != 3 {
+		return lvalErr("if passed in %d args, not 3", a.cellCount())
+	}
+	if a.cells[0].ltype != lvalNumType {
+		return lvalErr("if cell0 is not a number")
+	}
+	if a.cells[1].ltype != lvalQexprType {
+		return lvalErr("if cell1 is not a Q-exp")
+	}
+	if a.cells[2].ltype != lvalQexprType {
+		return lvalErr("if cell2 is not a Q-exp")
+	}
+	// Mark both expressions as evaluable
+	a.cells[1].ltype = lvalSexprType
+	a.cells[2].ltype = lvalSexprType
+	// Determine branch direction
+	var x *lval
+	if a.cells[0].num != 0 {
+		// If condition is true, evaluate the first expression
+		x = a.lvalPop(1).lvalEval(e)
+	} else {
+		// Otherwise, evaluate the second expression
+		x = a.lvalPop(2).lvalEval(e)
+	}
+	return x
+}
+
 func builtinAdd(e *lenv, a *lval) *lval {
 	return builtinOp(e, a, "+")
 }

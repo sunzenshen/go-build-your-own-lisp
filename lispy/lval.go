@@ -360,3 +360,40 @@ func lvalCall(e *lenv, f *lval, a *lval) *lval {
 	// Otherwise, return partially evaluated function
 	return lvalCopy(f)
 }
+
+func lvalEq(x, y *lval) bool {
+	// Different types are never equal
+	if x.ltype != y.ltype {
+		return false
+	}
+	// Compare based on type
+	switch x.ltype {
+	case lvalNumType:
+		return x.num == y.num
+	case lvalErrType:
+		return x.err == y.err
+	case lvalSymType:
+		return x.sym == y.sym
+	case lvalFunType:
+		if x.builtin != nil || y.builtin != nil {
+			return &x.builtin == &y.builtin
+		} else {
+			return lvalEq(x.formals, y.formals) && lvalEq(x.body, y.body)
+		}
+	case lvalQexprType:
+		fallthrough
+	case lvalSexprType:
+		// Compare each element in the lists
+		if x.cellCount() != y.cellCount() {
+			return false
+		}
+		for i := 0; i < x.cellCount(); i++ {
+			if !lvalEq(x.cells[i], y.cells[i]) {
+				return false
+			}
+		}
+		// Lists have same elements
+		return true
+	}
+	return false
+}

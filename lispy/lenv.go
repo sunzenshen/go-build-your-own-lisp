@@ -76,15 +76,24 @@ func (e *lenv) lenvAddBuiltin(name string, function lbuiltin) {
 }
 
 func (e *lenv) lenvAddBuiltins() {
-	// List Functions
+	// Define Functions
 	e.lenvAddBuiltin("def", builtinDef)
 	e.lenvAddBuiltin("=", builtinPut)
 	e.lenvAddBuiltin("\\", builtinLambda)
+	// List Functions
 	e.lenvAddBuiltin("list", builtinList)
 	e.lenvAddBuiltin("head", builtinHead)
 	e.lenvAddBuiltin("tail", builtinTail)
 	e.lenvAddBuiltin("eval", builtinEval)
 	e.lenvAddBuiltin("join", builtinJoin)
+	// Comparison Functions
+	e.lenvAddBuiltin("if", builtinIf)
+	e.lenvAddBuiltin("==", builtinEqual)
+	e.lenvAddBuiltin("!=", builtinNotEqual)
+	e.lenvAddBuiltin(">", builtinGreaterThan)
+	e.lenvAddBuiltin("<", builtinLessThan)
+	e.lenvAddBuiltin(">=", builtinGreaterEqual)
+	e.lenvAddBuiltin("<=", builtinLessEqual)
 	// Mathematical Functions
 	e.lenvAddBuiltin("+", builtinAdd)
 	e.lenvAddBuiltin("-", builtinSub)
