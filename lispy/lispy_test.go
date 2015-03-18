@@ -242,3 +242,39 @@ func TestConditionals(t *testing.T) {
 		}
 	}
 }
+
+func TestRecursiveFunctions(t *testing.T) {
+	l := InitLispy()
+	defer CleanLispy(l)
+
+	cases := []struct {
+		input string
+		want  string
+	}{
+		{"def {fun} (\\ {args body} {def (head args) (\\ (tail args) body)})", "()"},
+		// Define recursive len function
+		{`(fun {len l} {
+			if (== l {})
+				{0}
+				{+ 1 (len (tail l))}
+		})`, "()"},
+		// Define recursive reverse function
+		{`(fun {reverse l} {
+			if (== l {})
+				{{}}
+				{join (reverse (tail l)) (head l)}
+		})`, "()"},
+		// Test out the recursive functions
+		{"len {}", "0"},
+		{"len {1 2 3}", "3"},
+		{"reverse {}", "{}"},
+		{"reverse {1 2 3}", "{3 2 1}"},
+	}
+
+	for _, c := range cases {
+		got := l.ReadEval(c.input, false)
+		if got.lvalString() != c.want {
+			t.Errorf("ReadEval input: \"%s\" returned: \"%s\", actually expected: \"%s\"", c.input, got.lvalString(), c.want)
+		}
+	}
+}
