@@ -1,0 +1,13 @@
+; This is a comment
+
+; This file and other Lispy scripts can be loaded into the interpreter.
+; for example:
+;                    go run prompt.go example.lspy
+
+(load "hello.lspy") ; Load another example script to print a greeting
+
+(print "Error example:")
+(if (== (+ 2 2) 5)
+  {print "five year plan in four years"}
+  {error "Arithmetic Nonsense"} ; Errors can also be displayed
+)
