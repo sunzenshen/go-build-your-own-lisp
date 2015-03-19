@@ -1,5 +1,7 @@
 package lispy
 
+import "github.com/sunzenshen/go-build-your-own-lisp/mpc"
+
 type lbuiltin func(*lenv, *lval) *lval
 
 func builtinOp(e *lenv, a *lval, op string) *lval {
@@ -254,6 +256,42 @@ func builtinIf(e *lenv, a *lval) *lval {
 		x = a.lvalPop(2).lvalEval(e)
 	}
 	return x
+}
+
+func builtinLoad(e *lenv, a *lval) *lval {
+	if a.cellCount() != 1 {
+		return lvalErr("load passed in a with %d cells, expected 1", a.cellCount())
+	}
+	if a.cells[0].ltype != lvalStrType {
+		return lvalErr("load did not get a string for input")
+	}
+	if e.parser == nil {
+		return lvalErr("load env is missing parser")
+	}
+	// Parse string as a file name
+	var ret *lval
+	r, err := mpc.MpcParseContents(a.cells[0].str, e.parser)
+	if err != nil {
+		// Get parse error in string format
+		errMsg := mpc.MpcErrString(r)
+		ret = lvalErr("Could not load library %s", errMsg)
+	} else if r != nil {
+		// Read contents
+		expr := lvalRead(mpc.GetOutput(r))
+		mpc.MpcAstDelete(r)
+		// Evaluate each expression
+		for expr.cellCount() > 0 {
+			x := expr.lvalPop(0).lvalEval(e)
+			// If evaluation leads to an error, print it
+			if x.ltype == lvalErrType {
+				x.lvalPrintLn()
+			}
+		}
+		// Return an empty list
+		ret = lvalSexpr()
+	}
+
+	return ret
 }
 
 func builtinAdd(e *lenv, a *lval) *lval {

@@ -1,15 +1,18 @@
 package lispy
 
 import "fmt"
+import "github.com/sunzenshen/go-build-your-own-lisp/mpc"
 
 type lenv struct {
-	par  *lenv
-	syms []string
-	vals []*lval
+	parser mpc.MpcParser
+	par    *lenv
+	syms   []string
+	vals   []*lval
 }
 
 func lenvNew() *lenv {
 	e := new(lenv)
+	e.parser = nil
 	e.par = nil
 	e.syms = nil
 	e.vals = nil

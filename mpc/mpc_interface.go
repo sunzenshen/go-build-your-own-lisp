@@ -11,6 +11,9 @@ import (
 // MpcAst is a pointer to a mpc-generated AST
 type MpcAst *C.mpc_ast_t
 
+// MpcError is a pointer to an mpc error
+type MpcError *C.mpc_err_t
+
 // MpcParser is a pointer to a parser created with mpc
 type MpcParser *C.struct_mpc_parser_t
 
@@ -40,6 +43,11 @@ func GetOperator(node MpcAst) string {
 // GetOutput accesses the output field of an input MpcResult
 func GetOutput(result *C.mpc_result_t) MpcAst {
 	return C.get_output(result)
+}
+
+// GetError accesses the error field of an input MpcResult
+func GetError(result *C.mpc_result_t) MpcError {
+	return C.get_error(result)
 }
 
 // GetTag accesses the tag field of an MpcAst
@@ -123,4 +131,28 @@ func MpcfUnescape(input string) string {
 	// mpcf_unescape calls free() on the input string. Refer to mpc.c for context.
 	ret := C.mpcf_unescape(unsafe.Pointer(cInput))
 	return C.GoString((*C.char)(ret))
+}
+
+// MpcParseContents parses the contents of a file
+func MpcParseContents(input string, parser MpcParser) (*C.mpc_result_t, error) {
+	cInput := C.CString(input)
+	defer C.free(unsafe.Pointer(cInput))
+	result := new(C.mpc_result_t)
+	var err error
+	ret := C.mpc_parse_contents(cInput, parser, result)
+	if ret == 0 {
+		err = errors.New("mpc: failed to parse input file")
+	}
+	return result, err
+}
+
+// MpcErrString gets the error string from an mpc result
+func MpcErrString(result *C.mpc_result_t) string {
+	err := GetError(result)
+	if err == nil {
+		return "<Failed to load error>"
+	}
+	cErrMsg := C.mpc_err_string(err)
+	MpcErrDelete(result)
+	return C.GoString(cErrMsg)
 }

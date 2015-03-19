@@ -1,5 +1,6 @@
 package lispy
 
+import "fmt"
 import "github.com/sunzenshen/go-build-your-own-lisp/mpc"
 
 // Lispy is a collection of the Lispy parser definitions
@@ -60,6 +61,7 @@ func InitLispy() Lispy {
 	// Init environment
 	l.env = lenvNew()
 	l.env.lenvAddBuiltins()
+	l.env.parser = lispy // For loading files with builtin
 	return l
 }
 
@@ -95,4 +97,19 @@ func (l *Lispy) ReadEval(input string, printErrors bool) *lval {
 // ReadEvalPrint takes a string, tries to interpret it in Lispy, and prints the result
 func (l *Lispy) ReadEvalPrint(input string) {
 	l.ReadEval(input, true).lvalPrintLn()
+}
+
+// LoadFiles loads a list of files into the Lispy environment
+func (l *Lispy) LoadFiles(files []string) {
+	for _, file := range files {
+		fmt.Println("Loading: ", file)
+		// Argument list with a single argument, the file name
+		args := lvalAdd(lvalSexpr(), lvalStr(file))
+		// Pass into builtin load to get the result
+		x := builtinLoad(l.env, args)
+		// If the result is an error, print it
+		if x.ltype == lvalErrType {
+			x.lvalPrintLn()
+		}
+	}
 }
