@@ -4,19 +4,33 @@ import "github.com/sunzenshen/go-build-your-own-lisp/mpc"
 
 // Lispy is a collection of the Lispy parser definitions
 type Lispy struct {
-	env                                                                           *lenv
-	numberParser, symbolParser, sexprParser, qexprParser, exprParser, lispyParser mpc.MpcParser
+	env          *lenv
+	numberParser mpc.MpcParser
+	symbolParser mpc.MpcParser
+	strParser    mpc.MpcParser
+	sexprParser  mpc.MpcParser
+	qexprParser  mpc.MpcParser
+	exprParser   mpc.MpcParser
+	lispyParser  mpc.MpcParser
 }
 
 // CleanLispy is used after parsers initiated by InitLispy are not longer to be used
 func CleanLispy(l Lispy) {
-	mpc.MpcCleanup(l.numberParser, l.symbolParser, l.sexprParser, l.qexprParser, l.exprParser, l.lispyParser)
+	mpc.MpcCleanup(
+		l.numberParser,
+		l.symbolParser,
+		l.strParser,
+		l.sexprParser,
+		l.qexprParser,
+		l.exprParser,
+		l.lispyParser)
 }
 
 // InitLispy returns the parsers for the Lispy language definition
 func InitLispy() Lispy {
 	number := mpc.MpcNew("number")
 	symbol := mpc.MpcNew("symbol")
+	str := mpc.MpcNew("string")
 	sexpr := mpc.MpcNew("sexpr")
 	qexpr := mpc.MpcNew("qexpr")
 	expr := mpc.MpcNew("expr")
@@ -24,14 +38,16 @@ func InitLispy() Lispy {
 	language := "" +
 		"number : /-?[0-9]+/                                                  ; " +
 		"symbol : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/                            ; " +
+		"string : /\"(\\\\.|[^\"])*\"/                                        ; " +
 		"sexpr  : '(' <expr>* ')'                                             ; " +
 		"qexpr  : '{' <expr>* '}'                                             ; " +
-		"expr   : <number> | <symbol> | <sexpr> | <qexpr>                     ; " +
+		"expr   : <number> | <symbol> | <string> | <sexpr> | <qexpr>          ; " +
 		"lispy  : /^/ <expr>* /$/                                             ; "
-	mpc.MpcaLang(language, number, symbol, sexpr, qexpr, expr, lispy)
+	mpc.MpcaLang(language, number, symbol, str, sexpr, qexpr, expr, lispy)
 	l := Lispy{}
 	l.numberParser = number
 	l.symbolParser = symbol
+	l.strParser = str
 	l.sexprParser = sexpr
 	l.qexprParser = qexpr
 	l.exprParser = expr

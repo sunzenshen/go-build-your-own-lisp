@@ -62,7 +62,7 @@ func TestValidIntegerMath(t *testing.T) {
 	}
 }
 
-func TestStringOutput(t *testing.T) {
+func TestListFunctions(t *testing.T) {
 	l := InitLispy()
 	defer CleanLispy(l)
 
@@ -269,6 +269,29 @@ func TestRecursiveFunctions(t *testing.T) {
 		{"len {1 2 3}", "3"},
 		{"reverse {}", "{}"},
 		{"reverse {1 2 3}", "{3 2 1}"},
+	}
+
+	for _, c := range cases {
+		got := l.ReadEval(c.input, false)
+		if got.lvalString() != c.want {
+			t.Errorf("ReadEval input: \"%s\" returned: \"%s\", actually expected: \"%s\"", c.input, got.lvalString(), c.want)
+		}
+	}
+}
+
+func TestStrings(t *testing.T) {
+	l := InitLispy()
+	defer CleanLispy(l)
+
+	cases := []struct {
+		input string
+		want  string
+	}{
+		{"\"hello\"", "\"hello\""},
+		{"\"hello\\n\"", "\"hello\\n\""},
+		{"\"hello\\\"\"", "\"hello\\\"\""},
+		{"head {\"hello\" \"world\"}", "{\"hello\"}"},
+		{"eval (head {\"hello\" \"world\"})", "\"hello\""},
 	}
 
 	for _, c := range cases {

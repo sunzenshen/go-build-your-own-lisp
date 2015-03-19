@@ -12,6 +12,7 @@ import (
 const (
 	lvalNumType = iota
 	lvalSymType
+	lvalStrType
 	lvalFunType
 	lvalSexprType
 	lvalQexprType
@@ -25,6 +26,7 @@ type lval struct {
 	num int64  // lvalNumType
 	err string // lvalErrType
 	sym string // lvalSymType
+	str string // lvalStrType
 
 	// Function
 	builtin lbuiltin // lvalFunType, nil for user defined function
@@ -57,6 +59,14 @@ func lvalSym(s string) *lval {
 	v := new(lval)
 	v.ltype = lvalSymType
 	v.sym = string(s)
+	return v
+}
+
+// lvalStr creates an lval string
+func lvalStr(s string) *lval {
+	v := new(lval)
+	v.ltype = lvalStrType
+	v.str = string(s)
 	return v
 }
 
@@ -114,6 +124,8 @@ func ltypeName(i int) string {
 		return "Error"
 	case lvalSymType:
 		return "Symbol"
+	case lvalStrType:
+		return "String"
 	case lvalFunType:
 		return "Function"
 	case lvalSexprType:
@@ -132,6 +144,8 @@ func (v *lval) lvalString() string {
 		return ("Error: " + v.err)
 	case lvalSymType:
 		return (v.sym)
+	case lvalStrType:
+		return v.lvalGetStr()
 	case lvalFunType:
 		if v.builtin == nil {
 			return "(\\ " + v.formals.lvalString() + " " + v.body.lvalString() + ")"
@@ -143,6 +157,22 @@ func (v *lval) lvalString() string {
 		return v.lvalExprString("{", "}")
 	}
 	return fmt.Sprintf("Error: lvalString() unhandled ltype %d", v.ltype)
+}
+
+func (v *lval) lvalGetStr() string {
+	// Make a copy of the string
+	escaped := string(v.str)
+	// Pass it through the escape function
+	escaped = mpc.MpcfEscape(escaped)
+	// Enclose the result between " characters
+	return "\"" + escaped + "\""
+}
+
+func lvalReadStr(t mpc.MpcAst) *lval {
+	contents := mpc.GetContents(t)
+	unescaped := contents[1 : len(contents)-1] // Cut off quote characters
+	unescaped = mpc.MpcfUnescape(unescaped)
+	return lvalStr(unescaped)
 }
 
 func (v *lval) lvalPrint() {
@@ -173,6 +203,8 @@ func lvalCopy(v *lval) *lval {
 		x.err = string(v.err)
 	case lvalSymType:
 		x.sym = string(v.sym)
+	case lvalStrType:
+		x.str = string(v.str)
 	case lvalSexprType:
 		fallthrough
 	case lvalQexprType:
@@ -219,6 +251,9 @@ func lvalRead(tree mpc.MpcAst) *lval {
 	}
 	if strings.Contains(mpc.GetTag(tree), "symbol") {
 		return lvalSym(mpc.GetContents(tree))
+	}
+	if strings.Contains(mpc.GetTag(tree), "string") {
+		return lvalReadStr(tree)
 	}
 	// If root (>) or S-expression, then create empty list
 	var x *lval
@@ -374,12 +409,13 @@ func lvalEq(x, y *lval) bool {
 		return x.err == y.err
 	case lvalSymType:
 		return x.sym == y.sym
+	case lvalStrType:
+		return x.str == y.str
 	case lvalFunType:
 		if x.builtin != nil || y.builtin != nil {
 			return &x.builtin == &y.builtin
-		} else {
-			return lvalEq(x.formals, y.formals) && lvalEq(x.body, y.body)
 		}
+		return lvalEq(x.formals, y.formals) && lvalEq(x.body, y.body)
 	case lvalQexprType:
 		fallthrough
 	case lvalSexprType:
