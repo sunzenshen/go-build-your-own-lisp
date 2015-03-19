@@ -287,11 +287,15 @@ func TestStrings(t *testing.T) {
 		input string
 		want  string
 	}{
+		// Strings
 		{"\"hello\"", "\"hello\""},
 		{"\"hello\\n\"", "\"hello\\n\""},
 		{"\"hello\\\"\"", "\"hello\\\"\""},
 		{"head {\"hello\" \"world\"}", "{\"hello\"}"},
 		{"eval (head {\"hello\" \"world\"})", "\"hello\""},
+		// Comments
+		{"; Ignore this comment", "()"},
+		{"; + 1 2", "()"},
 	}
 
 	for _, c := range cases {

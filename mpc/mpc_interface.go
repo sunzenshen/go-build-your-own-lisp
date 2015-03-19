@@ -57,13 +57,13 @@ func MpcaLang(language string, parsers ...MpcParser) {
 	cLanguage := C.CString(language)
 	defer C.free(unsafe.Pointer(cLanguage))
 	C.mpca_lang_if(C.MPCA_LANG_DEFAULT, cLanguage,
-		parsers[0], parsers[1], parsers[2], parsers[3], parsers[4], parsers[5], parsers[6])
+		parsers[0], parsers[1], parsers[2], parsers[3], parsers[4], parsers[5], parsers[6], parsers[7])
 }
 
 // MpcCleanup calls mpc's cleanup function indirectly, using a wrapper for the variadic args
 func MpcCleanup(parsers ...MpcParser) {
 	C.mpc_cleanup_if(C.int(len(parsers)),
-		parsers[0], parsers[1], parsers[2], parsers[3], parsers[4], parsers[5], parsers[6])
+		parsers[0], parsers[1], parsers[2], parsers[3], parsers[4], parsers[5], parsers[6], parsers[7])
 }
 
 // MpcNew returns a pointer to an initiated mpc parser

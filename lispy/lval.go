@@ -274,6 +274,8 @@ func lvalRead(tree mpc.MpcAst) *lval {
 			iContents == "}" ||
 			mpc.GetTag(iChild) == "regex" {
 			continue
+		} else if strings.Contains(mpc.GetTag(iChild), "comment") {
+			continue
 		} else {
 			x = lvalAdd(x, lvalRead(iChild))
 		}

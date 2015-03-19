@@ -4,14 +4,15 @@ import "github.com/sunzenshen/go-build-your-own-lisp/mpc"
 
 // Lispy is a collection of the Lispy parser definitions
 type Lispy struct {
-	env          *lenv
-	numberParser mpc.MpcParser
-	symbolParser mpc.MpcParser
-	strParser    mpc.MpcParser
-	sexprParser  mpc.MpcParser
-	qexprParser  mpc.MpcParser
-	exprParser   mpc.MpcParser
-	lispyParser  mpc.MpcParser
+	env           *lenv
+	numberParser  mpc.MpcParser
+	symbolParser  mpc.MpcParser
+	strParser     mpc.MpcParser
+	commentParser mpc.MpcParser
+	sexprParser   mpc.MpcParser
+	qexprParser   mpc.MpcParser
+	exprParser    mpc.MpcParser
+	lispyParser   mpc.MpcParser
 }
 
 // CleanLispy is used after parsers initiated by InitLispy are not longer to be used
@@ -20,6 +21,7 @@ func CleanLispy(l Lispy) {
 		l.numberParser,
 		l.symbolParser,
 		l.strParser,
+		l.commentParser,
 		l.sexprParser,
 		l.qexprParser,
 		l.exprParser,
@@ -31,23 +33,26 @@ func InitLispy() Lispy {
 	number := mpc.MpcNew("number")
 	symbol := mpc.MpcNew("symbol")
 	str := mpc.MpcNew("string")
+	comment := mpc.MpcNew("comment")
 	sexpr := mpc.MpcNew("sexpr")
 	qexpr := mpc.MpcNew("qexpr")
 	expr := mpc.MpcNew("expr")
 	lispy := mpc.MpcNew("lispy")
 	language := "" +
-		"number : /-?[0-9]+/                                                  ; " +
-		"symbol : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/                            ; " +
-		"string : /\"(\\\\.|[^\"])*\"/                                        ; " +
-		"sexpr  : '(' <expr>* ')'                                             ; " +
-		"qexpr  : '{' <expr>* '}'                                             ; " +
-		"expr   : <number> | <symbol> | <string> | <sexpr> | <qexpr>          ; " +
-		"lispy  : /^/ <expr>* /$/                                             ; "
-	mpc.MpcaLang(language, number, symbol, str, sexpr, qexpr, expr, lispy)
+		"number  : /-?[0-9]+/                                                     ; " +
+		"symbol  : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/                               ; " +
+		"string  : /\"(\\\\.|[^\"])*\"/                                           ; " +
+		"comment : /;[^\\r\\n]*/                                                  ; " +
+		"sexpr   : '(' <expr>* ')'                                                ; " +
+		"qexpr   : '{' <expr>* '}'                                                ; " +
+		"expr    : <number> | <symbol> | <string> | <comment> | <sexpr> | <qexpr> ; " +
+		"lispy   : /^/ <expr>* /$/                                                ; "
+	mpc.MpcaLang(language, number, symbol, str, comment, sexpr, qexpr, expr, lispy)
 	l := Lispy{}
 	l.numberParser = number
 	l.symbolParser = symbol
 	l.strParser = str
+	l.commentParser = comment
 	l.sexprParser = sexpr
 	l.qexprParser = qexpr
 	l.exprParser = expr
