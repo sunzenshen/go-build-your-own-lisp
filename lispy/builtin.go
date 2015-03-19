@@ -1,5 +1,6 @@
 package lispy
 
+import "fmt"
 import "github.com/sunzenshen/go-build-your-own-lisp/mpc"
 
 type lbuiltin func(*lenv, *lval) *lval
@@ -292,6 +293,27 @@ func builtinLoad(e *lenv, a *lval) *lval {
 	}
 
 	return ret
+}
+
+func builtinPrint(e *lenv, a *lval) *lval {
+	// Print each argument followed by a space
+	for _, cell := range a.cells {
+		cell.lvalPrint()
+		fmt.Println(" ")
+	}
+	fmt.Println("")
+	return lvalSexpr()
+}
+
+func builtinError(e *lenv, a *lval) *lval {
+	if a.cellCount() != 1 {
+		return lvalErr("error: %d parameters were passed in, expected only 1", a.cellCount())
+	}
+	if a.cells[0].ltype != lvalStrType {
+		return lvalErr("error: argument is not a string")
+	}
+	// Construct error from the first argument
+	return lvalErr(a.cells[0].str)
 }
 
 func builtinAdd(e *lenv, a *lval) *lval {

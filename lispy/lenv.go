@@ -97,6 +97,10 @@ func (e *lenv) lenvAddBuiltins() {
 	e.lenvAddBuiltin("<", builtinLessThan)
 	e.lenvAddBuiltin(">=", builtinGreaterEqual)
 	e.lenvAddBuiltin("<=", builtinLessEqual)
+	// String Functions
+	e.lenvAddBuiltin("load", builtinLoad)
+	e.lenvAddBuiltin("error", builtinError)
+	e.lenvAddBuiltin("print", builtinPrint)
 	// Mathematical Functions
 	e.lenvAddBuiltin("+", builtinAdd)
 	e.lenvAddBuiltin("-", builtinSub)
