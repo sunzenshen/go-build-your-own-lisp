@@ -319,6 +319,7 @@ func TestStandardLibrary(t *testing.T) {
 		{"fst {1 2 3 4}", "1"},
 		{"snd {1 2 3 4}", "2"},
 		{"trd {1 2 3 4}", "3"},
+		{"len {1 2 3 4}", "4"},
 	}
 
 	for _, c := range cases {

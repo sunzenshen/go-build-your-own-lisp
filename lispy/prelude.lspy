@@ -26,3 +26,10 @@
 (fun {fst l} { eval (head l) })
 (fun {snd l} { eval (head (tail l)) })
 (fun {trd l} { eval (head (tail (tail l))) })
+
+; List Length
+(fun {len l} {
+  if (== l nil)
+    {0}
+    {+ 1 (len (tail l))}
+})
