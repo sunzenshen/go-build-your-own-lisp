@@ -316,10 +316,26 @@ func TestStandardLibrary(t *testing.T) {
 		input string
 		want  string
 	}{
-		{"fst {1 2 3 4}", "1"},
-		{"snd {1 2 3 4}", "2"},
-		{"trd {1 2 3 4}", "3"},
-		{"len {1 2 3 4}", "4"},
+		// fst snd trd
+		{"fst {1}", "1"},
+		{"snd {1 2}", "2"},
+		{"trd {1 2 3}", "3"},
+		{"fst {-1 2 -3 4}", "-1"},
+		{"snd {1 -2 -3 -4}", "-2"},
+		{"trd {-1 2 -3 4}", "-3"},
+		// length of list
+		{"len {}", "0"},
+		{"len {42}", "1"},
+		{"len {1 2}", "2"},
+		{"len {-1 -2 -3}", "3"},
+		{"len {10 20 30 40}", "4"},
+		// nth element of list
+		{"nth 0 {1}", "1"},
+		{"nth 1 {1 2}", "2"},
+		{"nth 2 {1 2 3}", "3"},
+		{"nth 0 {-0 1 -2}", "0"},
+		{"nth 1 {0 -1 2}", "-1"},
+		{"nth 2 {-0 1 -2}", "-2"},
 	}
 
 	for _, c := range cases {

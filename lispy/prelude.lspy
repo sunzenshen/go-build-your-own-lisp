@@ -33,3 +33,10 @@
     {0}
     {+ 1 (len (tail l))}
 })
+
+; Get Nth item in a list
+(fun {nth n l} {
+  if (== n 0)
+    {fst l}
+    {nth (- n 1) (tail l)}
+})
