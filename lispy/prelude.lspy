@@ -100,3 +100,15 @@
 
 ; Product of a list
 (fun {product l} {foldl * 1 l})
+
+; Perform list of instructions in order
+(fun {do & l} {
+  if (== l nil)
+    {nil}
+    {last l}
+})
+
+; Open new scope
+(fun {let b} {
+  ((\ {_} b) ())
+})

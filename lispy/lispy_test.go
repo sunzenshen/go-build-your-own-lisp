@@ -392,6 +392,9 @@ func TestStandardLibrary(t *testing.T) {
 		// fold examples
 		{"sum {0 -1 2 -3 4}", "2"},
 		{"product {-1 2 -3 4 -5}", "-120"},
+		// Scope isolation
+		{"let {do (= {x} 100) (x)}", "100"},
+		{"x", "Error: Unbound Symbol: 'x'"},
 	}
 
 	for _, c := range cases {
