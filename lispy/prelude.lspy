@@ -69,3 +69,12 @@
       {true}
       {elem x (tail l)}}
 })
+
+; Apply given function to a list
+(fun {map f l} {
+  if (== l nil)
+    {nil}
+    {join
+      (list (f (fst l)))
+      (map f (tail l))}
+})

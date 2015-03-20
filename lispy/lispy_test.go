@@ -384,6 +384,9 @@ func TestStandardLibrary(t *testing.T) {
 		{"elem \"search\" {42 \"search\"}", truth},
 		{"elem 42 {{} 42 \"search\"}", truth},
 		{"elem -1 {{} 42 \"search\"}", falsity},
+		// map function to list
+		{"map - {5 6 7 8 2 22 44}", "{-5 -6 -7 -8 -2 -22 -44}"},
+		{"map (\\ {x} {+ x 10}) {5 2 11}", "{15 12 21}"},
 	}
 
 	for _, c := range cases {
