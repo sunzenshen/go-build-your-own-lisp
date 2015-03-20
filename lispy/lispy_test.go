@@ -220,19 +220,27 @@ func TestConditionals(t *testing.T) {
 	l := InitLispy()
 	defer CleanLispy(l)
 
+	truth := "1"
+	falsity := "0"
+
 	cases := []struct {
 		input string
 		want  string
 	}{
-		{"> 10 5", "1"},
-		{"<= 88 5", "0"},
-		{"== 5 6", "0"},
-		{"== 5 {}", "0"},
-		{"== 1 1", "1"},
-		{"!= {} 56", "1"},
-		{"== {1 2 3 { 5 6}} {1  2 3  {5 6}}", "1"},
+		{"> 10 5", truth},
+		{"<= 88 5", falsity},
+		{"== 5 6", falsity},
+		{"== 5 {}", falsity},
+		{"== 1 1", truth},
+		{"!= {} 56", truth},
+		{"== {1 2 3 { 5 6}} {1  2 3  {5 6}}", truth},
 		{"def {x y} 100 200", "()"},
 		{"if (== x y) {+ x y} {- x y}", "-100"},
+		// Standard Library
+		{"== nil {}", truth},
+		{"== true 1", truth},
+		{"== false 0", truth},
+		{"!= true false", truth},
 	}
 
 	for _, c := range cases {
