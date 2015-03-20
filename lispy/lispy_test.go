@@ -348,6 +348,15 @@ func TestStandardLibrary(t *testing.T) {
 		{"last {1}", "1"},
 		{"last {-1 -2}", "-2"},
 		{"last {1 2 \"three\"}", "\"three\""},
+		// take N elements of list
+		{"take 0 nil", "{}"},
+		{"take 0 {nil}", "{}"},
+		{"take 1 {nil}", "{nil}"},
+		{"take 2 {nil \"two\"}", "{nil \"two\"}"},
+		{"take 3 {1 2 3}", "{1 2 3}"},
+		{"take 2 {1 2 3}", "{1 2}"},
+		{"take 1 {1 2 3}", "{1}"},
+		{"take 0 {1 2 3}", "{}"},
 	}
 
 	for _, c := range cases {
