@@ -78,3 +78,12 @@
       (list (f (fst l)))
       (map f (tail l))}
 })
+
+; Apply filter to list
+(fun {filter f l} {
+  if (== l nil)
+    {nil}
+    {join
+      (if (f (fst l)) {head l} {nil})
+      (filter f (tail l))}
+})

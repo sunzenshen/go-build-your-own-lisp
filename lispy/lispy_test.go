@@ -387,6 +387,8 @@ func TestStandardLibrary(t *testing.T) {
 		// map function to list
 		{"map - {5 6 7 8 2 22 44}", "{-5 -6 -7 -8 -2 -22 -44}"},
 		{"map (\\ {x} {+ x 10}) {5 2 11}", "{15 12 21}"},
+		// filter list
+		{"filter (\\ {x} {> x 2}) {5 2 11 -7 8 1}", "{5 11 8}"},
 	}
 
 	for _, c := range cases {
