@@ -40,3 +40,6 @@
     {fst l}
     {nth (- n 1) (tail l)}
 })
+
+; Get last item in a list
+(fun {last l} {nth (- (len l) 1) l})

@@ -317,18 +317,24 @@ func TestStandardLibrary(t *testing.T) {
 		want  string
 	}{
 		// fst snd trd
+		{"fst {\"first\"}", "\"first\""},
+		{"fst {nil}", "{}"},
 		{"fst {1}", "1"},
+		{"fst {{1}}", "{1}"},
 		{"snd {1 2}", "2"},
 		{"trd {1 2 3}", "3"},
 		{"fst {-1 2 -3 4}", "-1"},
 		{"snd {1 -2 -3 -4}", "-2"},
 		{"trd {-1 2 -3 4}", "-3"},
+		{"trd {-1 2 \"third\" 4}", "\"third\""},
 		// length of list
+		{"len nil", "0"},
 		{"len {}", "0"},
 		{"len {42}", "1"},
 		{"len {1 2}", "2"},
 		{"len {-1 -2 -3}", "3"},
 		{"len {10 20 30 40}", "4"},
+		{"len {10 true \"third\" nil}", "4"},
 		// nth element of list
 		{"nth 0 {1}", "1"},
 		{"nth 1 {1 2}", "2"},
@@ -336,6 +342,12 @@ func TestStandardLibrary(t *testing.T) {
 		{"nth 0 {-0 1 -2}", "0"},
 		{"nth 1 {0 -1 2}", "-1"},
 		{"nth 2 {-0 1 -2}", "-2"},
+		{"nth 2 {-0 1 nil}", "{}"},
+		{"nth 2 {-0 1 \"nth\"}", "\"nth\""},
+		// last element of list
+		{"last {1}", "1"},
+		{"last {-1 -2}", "-2"},
+		{"last {1 2 \"three\"}", "\"three\""},
 	}
 
 	for _, c := range cases {
