@@ -389,6 +389,9 @@ func TestStandardLibrary(t *testing.T) {
 		{"map (\\ {x} {+ x 10}) {5 2 11}", "{15 12 21}"},
 		// filter list
 		{"filter (\\ {x} {> x 2}) {5 2 11 -7 8 1}", "{5 11 8}"},
+		// fold examples
+		{"sum {0 -1 2 -3 4}", "2"},
+		{"product {-1 2 -3 4 -5}", "-120"},
 	}
 
 	for _, c := range cases {

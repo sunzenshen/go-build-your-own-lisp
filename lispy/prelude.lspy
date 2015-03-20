@@ -87,3 +87,16 @@
       (if (f (fst l)) {head l} {nil})
       (filter f (tail l))}
 })
+
+; Fold left
+(fun {foldl f z l} {
+  if (== l nil)
+    {z}
+    {foldl f (f z (fst l)) (tail l)}
+})
+
+; Sum elements of a list
+(fun {sum l} {foldl + 0 l})
+
+; Product of a list
+(fun {product l} {foldl * 1 l})
