@@ -190,6 +190,7 @@ func TestFunctionDefinitions(t *testing.T) {
 func TestVariableArgsAndCurrying(t *testing.T) {
 	l := InitLispy()
 	defer CleanLispy(l)
+	l.ReadEval("load \"prelude.lspy\"", false) // Load standard library
 
 	cases := []struct {
 		input string
@@ -218,6 +219,7 @@ func TestVariableArgsAndCurrying(t *testing.T) {
 func TestConditionals(t *testing.T) {
 	l := InitLispy()
 	defer CleanLispy(l)
+	l.ReadEval("load \"prelude.lspy\"", false) // Load standard library
 
 	cases := []struct {
 		input string
@@ -250,6 +252,7 @@ func TestConditionals(t *testing.T) {
 func TestRecursiveFunctions(t *testing.T) {
 	l := InitLispy()
 	defer CleanLispy(l)
+	l.ReadEval("load \"prelude.lspy\"", false) // Load standard library
 
 	cases := []struct {
 		input string
@@ -312,6 +315,7 @@ func TestStrings(t *testing.T) {
 func TestStandardLibrary(t *testing.T) {
 	l := InitLispy()
 	defer CleanLispy(l)
+	l.ReadEval("load \"prelude.lspy\"", false) // Load standard library
 
 	cases := []struct {
 		input string

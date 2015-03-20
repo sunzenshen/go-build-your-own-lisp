@@ -18,6 +18,9 @@ func main() {
 	l := lispy.InitLispy()
 	defer lispy.CleanLispy(l)
 
+	// Load standard library
+	l.LoadFiles([]string{"lispy/prelude.lspy"})
+
 	// Supplied with a list of files
 	if len(os.Args) > 1 {
 		fmt.Println("Files passed into Lispy interpreter")

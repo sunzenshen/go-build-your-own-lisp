@@ -61,8 +61,7 @@ func InitLispy() Lispy {
 	// Init environment
 	l.env = lenvNew()
 	l.env.lenvAddBuiltins()
-	l.env.parser = lispy                       // For loading files with builtin
-	l.ReadEval("load \"prelude.lspy\"", false) // Load standard library
+	l.env.parser = lispy // For loading files with builtin
 	return l
 }
 
