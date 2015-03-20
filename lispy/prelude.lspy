@@ -57,3 +57,6 @@
     {l}
     {drop (- n 1) (tail l)}
 })
+
+; Split list at Nth item
+(fun {split n l} {list (take n l) (drop n l)})
