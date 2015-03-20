@@ -2,6 +2,10 @@ package lispy
 
 import "testing"
 
+// Truth values for evaluated output
+const truth = "1"
+const falsity = "0"
+
 func TestLvalRead(t *testing.T) {
 	l := InitLispy()
 	defer CleanLispy(l)
@@ -215,9 +219,6 @@ func TestConditionals(t *testing.T) {
 	l := InitLispy()
 	defer CleanLispy(l)
 
-	truth := "1"
-	falsity := "0"
-
 	cases := []struct {
 		input string
 		want  string
@@ -377,6 +378,12 @@ func TestStandardLibrary(t *testing.T) {
 		{"split 1 {1 2 3}", "{{1} {2 3}}"},
 		{"split 2 {1 2 3}", "{{1 2} {3}}"},
 		{"split 3 {1 2 3}", "{{1 2 3} {}}"},
+		// elem in list
+		{"elem 0 nil", falsity},
+		{"elem 1 {1}", truth},
+		{"elem \"search\" {42 \"search\"}", truth},
+		{"elem 42 {{} 42 \"search\"}", truth},
+		{"elem -1 {{} 42 \"search\"}", falsity},
 	}
 
 	for _, c := range cases {

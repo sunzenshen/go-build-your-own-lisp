@@ -60,3 +60,12 @@
 
 ; Split list at Nth item
 (fun {split n l} {list (take n l) (drop n l)})
+
+; Is element a member of the list?
+(fun {elem x l} {
+  if (== l nil)
+    {false}
+    {if (== x (fst l))
+      {true}
+      {elem x (tail l)}}
+})
