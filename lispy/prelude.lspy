@@ -9,3 +9,15 @@
 (def {fun} (\ {f b}
   {def (head f) (\ (tail f) b)}
 ))
+
+; Unpack list for function
+(fun {unpack f xs}
+  {eval (join (list f) xs)}
+)
+
+; Pack list for function
+(fun {pack f & xs} {f xs})
+
+; Curried and uncurried calling
+(def {uncurry} pack)
+(def {curry} unpack)
