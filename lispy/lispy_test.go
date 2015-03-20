@@ -307,3 +307,24 @@ func TestStrings(t *testing.T) {
 		}
 	}
 }
+
+func TestStandardLibrary(t *testing.T) {
+	l := InitLispy()
+	defer CleanLispy(l)
+
+	cases := []struct {
+		input string
+		want  string
+	}{
+		{"fst {1 2 3 4}", "1"},
+		{"snd {1 2 3 4}", "2"},
+		{"trd {1 2 3 4}", "3"},
+	}
+
+	for _, c := range cases {
+		got := l.ReadEval(c.input, false)
+		if got.lvalString() != c.want {
+			t.Errorf("ReadEval input: \"%s\" returned: \"%s\", actually expected: \"%s\"", c.input, got.lvalString(), c.want)
+		}
+	}
+}
