@@ -193,7 +193,6 @@ func TestVariableArgsAndCurrying(t *testing.T) {
 	}{
 		{"\\ {args body} {def (head args) (\\ (tail args) body)}",
 			"(\\ {args body} {def (head args) (\\ (tail args) body)})"},
-		{"def {fun} (\\ {args body} {def (head args) (\\ (tail args) body)})", "()"},
 		{"fun {add-together x y} {+ x y}", "()"},
 		{"add-together 1 2", "3"},
 		{"fun {unpack f xs} {eval (join (list f) xs)}", "()"},
@@ -259,7 +258,6 @@ func TestRecursiveFunctions(t *testing.T) {
 		input string
 		want  string
 	}{
-		{"def {fun} (\\ {args body} {def (head args) (\\ (tail args) body)})", "()"},
 		// Define recursive len function
 		{`(fun {len l} {
 			if (== l {})
