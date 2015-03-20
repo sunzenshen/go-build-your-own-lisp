@@ -357,6 +357,15 @@ func TestStandardLibrary(t *testing.T) {
 		{"take 2 {1 2 3}", "{1 2}"},
 		{"take 1 {1 2 3}", "{1}"},
 		{"take 0 {1 2 3}", "{}"},
+		// drop N elements of list
+		{"drop 0 nil", "{}"},
+		{"drop 0 {nil}", "{nil}"},
+		{"drop 1 {nil}", "{}"},
+		{"drop 2 {nil \"two\"}", "{}"},
+		{"drop 3 {1 2 3}", "{}"},
+		{"drop 2 {1 2 3}", "{3}"},
+		{"drop 1 {1 2 3}", "{2 3}"},
+		{"drop 0 {1 2 3}", "{1 2 3}"},
 	}
 
 	for _, c := range cases {

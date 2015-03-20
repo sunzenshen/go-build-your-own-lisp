@@ -50,3 +50,10 @@
     {nil}
     {join (head l) (take (- n 1) (tail l))}
 })
+
+; Drop first N items from a list and return the rest
+(fun {drop n l} {
+  if (== n 0)
+    {l}
+    {drop (- n 1) (tail l)}
+})
