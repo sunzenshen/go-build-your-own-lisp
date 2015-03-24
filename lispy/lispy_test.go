@@ -416,6 +416,15 @@ func TestStandardLibrary(t *testing.T) {
 		{"month-day-suffix 2", "\"nd\""}, // second
 		{"month-day-suffix 3", "\"rd\""}, // third
 		{"month-day-suffix 4", "\"th\""}, // fourth
+		// Case statement
+		{"day-name 0", "\"Monday\""},
+		{"day-name 1", "\"Tuesday\""},
+		{"day-name 2", "\"Wednesday\""},
+		{"day-name 3", "\"Thursday\""},
+		{"day-name 4", "\"Friday\""},
+		{"day-name 5", "\"Saturday\""},
+		{"day-name 6", "\"Sunday\""},
+		{"day-name 7", "Error: No case found!"},
 	}
 
 	for _, c := range cases {

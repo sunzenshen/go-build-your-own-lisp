@@ -138,3 +138,24 @@
     {(== i 3) "rd"}
     {otherwise "th"}
 })
+
+; Case conditional
+(fun {case x & cs} {
+  if (== cs nil)
+    {error "No case found!"}
+    {if (== x (fst (fst cs)))
+      {snd (fst cs)}
+      {unpack case (join (list x) (tail cs))}}
+})
+
+; Weekday enums
+(fun {day-name x} {
+  case x
+    {0 "Monday"}
+    {1 "Tuesday"}
+    {2 "Wednesday"}
+    {3 "Thursday"}
+    {4 "Friday"}
+    {5 "Saturday"}
+    {6 "Sunday"}
+})
