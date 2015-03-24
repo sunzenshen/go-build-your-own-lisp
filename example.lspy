@@ -2,7 +2,7 @@
 
 ; This file and other Lispy scripts can be loaded into the interpreter.
 ; for example:
-;                    go run prompt.go example.lspy
+;                    go run main.go example.lspy
 
 (load "hello.lspy") ; Load another example script to print a greeting
 
