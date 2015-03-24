@@ -399,6 +399,17 @@ func TestStandardLibrary(t *testing.T) {
 		// Scope isolation
 		{"let {do (= {x} 100) (x)}", "100"},
 		{"x", "Error: Unbound Symbol: 'x'"},
+		// Logical operators
+		{"not true", falsity},
+		{"not false", truth},
+		{"if (or true true) {true} {false}", truth},
+		{"or false true", truth},
+		{"or true false", truth},
+		{"or false false", falsity},
+		{"and true true", truth},
+		{"and false true", falsity},
+		{"and true false", falsity},
+		{"and false false", falsity},
 	}
 
 	for _, c := range cases {
