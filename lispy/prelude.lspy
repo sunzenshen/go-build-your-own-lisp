@@ -117,3 +117,24 @@
 (fun {not x}   {- 1 x})
 (fun {or x y}  {+ x y})
 (fun {and x y} {* x y})
+
+; Select statement
+(fun {select & cs} {
+  if (== cs nil)
+    {error "No selection found!"}
+    {if (fst (fst cs))
+      {snd (fst cs)}
+      {unpack select (tail cs)}}
+})
+
+; Default case
+(def {otherwise} true)
+
+; Day of Month suffix
+(fun {month-day-suffix i} {
+  select
+    {(== i 1) "st"}
+    {(== i 2) "nd"}
+    {(== i 3) "rd"}
+    {otherwise "th"}
+})

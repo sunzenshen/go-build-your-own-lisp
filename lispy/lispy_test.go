@@ -410,6 +410,12 @@ func TestStandardLibrary(t *testing.T) {
 		{"and false true", falsity},
 		{"and true false", falsity},
 		{"and false false", falsity},
+		// Select statement
+		{"month-day-suffix 0", "\"th\""}, // zeroth
+		{"month-day-suffix 1", "\"st\""}, // first
+		{"month-day-suffix 2", "\"nd\""}, // second
+		{"month-day-suffix 3", "\"rd\""}, // third
+		{"month-day-suffix 4", "\"th\""}, // fourth
 	}
 
 	for _, c := range cases {
