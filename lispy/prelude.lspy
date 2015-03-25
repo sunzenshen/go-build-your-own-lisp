@@ -68,11 +68,13 @@
 
 ; Is element a member of the list?
 (fun {elem x l} {
-  if (== l nil)
-    {false}
-    {if (== x (fst l))
-      {true}
-      {elem x (tail l)}}
+  foldl
+    (\ {history member}
+      {if (== x member)
+        {true}
+        {history}})
+    false
+    l
 })
 
 ; Apply given function to a list
