@@ -27,11 +27,16 @@
 (fun {snd l} { eval (head (tail l)) })
 (fun {trd l} { eval (head (tail (tail l))) })
 
+; Fold left
+(fun {foldl f z l} {
+  if (== l nil)
+    {z}
+    {foldl f (f z (fst l)) (tail l)}
+})
+
 ; List Length
 (fun {len l} {
-  if (== l nil)
-    {0}
-    {+ 1 (len (tail l))}
+  foldl (\ {x y} {+ x 1}) 0 l
 })
 
 ; Get Nth item in a list
@@ -86,13 +91,6 @@
     {join
       (if (f (fst l)) {head l} {nil})
       (filter f (tail l))}
-})
-
-; Fold left
-(fun {foldl f z l} {
-  if (== l nil)
-    {z}
-    {foldl f (f z (fst l)) (tail l)}
 })
 
 ; Sum elements of a list
