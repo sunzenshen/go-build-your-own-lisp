@@ -36,7 +36,7 @@
 
 ; List Length
 (fun {len l} {
-  foldl (\ {x y} {+ x 1}) 0 l
+  foldl (\ {acc _} {+ acc 1}) 0 l
 })
 
 ; Get Nth item in a list
