@@ -42,12 +42,14 @@ func GetOperator(node MpcAst) string {
 
 // GetOutput accesses the output field of an input MpcResult
 func GetOutput(result *C.mpc_result_t) MpcAst {
-	return C.get_output(result)
+	cast := (*MpcAst)(unsafe.Pointer(result))
+	return *cast
 }
 
 // GetError accesses the error field of an input MpcResult
 func GetError(result *C.mpc_result_t) MpcError {
-	return C.get_error(result)
+	cast := (*MpcError)(unsafe.Pointer(result))
+	return *cast
 }
 
 // GetTag accesses the tag field of an MpcAst
@@ -57,7 +59,7 @@ func GetTag(node MpcAst) string {
 
 // MpcAstDelete cleans up an AST contained in a MpcResult
 func MpcAstDelete(result *C.mpc_result_t) {
-	C.mpc_ast_delete(C.get_output(result))
+	C.mpc_ast_delete(GetOutput(result))
 }
 
 // MpcaLang uses a language definition to generate parsers
@@ -97,12 +99,12 @@ func MpcParse(input string, parser MpcParser) (C.mpc_result_t, error) {
 
 // MpcErrDelete cleans up the error info in an MpcResult
 func MpcErrDelete(result *C.mpc_result_t) {
-	C.mpc_err_delete(C.get_error(result))
+	C.mpc_err_delete(GetError(result))
 }
 
 // MpcErrPrint prints the reason for failed AST parsing
 func MpcErrPrint(result *C.mpc_result_t) {
-	C.mpc_err_print(C.get_error(result))
+	C.mpc_err_print(GetError(result))
 }
 
 // PrintAst parses an input string for its AST representation
@@ -112,7 +114,7 @@ func PrintAst(input string, mpcParser MpcParser) {
 		MpcErrPrint(&r)
 		MpcErrDelete(&r)
 	} else {
-		C.mpc_ast_print(C.get_output(&r))
+		C.mpc_ast_print(GetOutput(&r))
 		MpcAstDelete(&r)
 	}
 }

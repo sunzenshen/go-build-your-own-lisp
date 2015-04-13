@@ -13,16 +13,6 @@ inline mpc_ast_t* get_child(mpc_ast_t* node, int index)
   return node->children[index]; // index into double pointer
 }
 
-inline mpc_err_t* get_error(mpc_result_t* result)
-{
-  return (result == NULL) ? NULL : result->error;
-}
-
-inline mpc_ast_t* get_output(mpc_result_t* result)
-{
-  return (result == NULL) ? NULL : result->output;
-}
-
 inline void mpc_cleanup_if
 (
   int n,
