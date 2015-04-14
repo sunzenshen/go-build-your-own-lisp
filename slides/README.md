@@ -7,9 +7,8 @@ In order to run the presentation slides,
 install the [go present](https://godoc.org/golang.org/x/tools/present) tool
 and run the “present” program in this directory.
 
-At the time, the command for installation was
+The command for installing the present tool was:
 ```
 go get code.google.com/p/go.tools/cmd/present
 ```
-
 ... but Google Code was being decommissioned at the time of this writing.
