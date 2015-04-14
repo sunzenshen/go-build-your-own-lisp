@@ -1,0 +1,17 @@
+package mpc
+
+// #cgo LDFLAGS: -lm
+// #include "mpc_interface.h"
+import "C"
+import "unsafe"
+
+func GetOutput(result *C.mpc_result_t) *C.mpc_ast_t {
+	cast := (**C.mpc_ast_t)(unsafe.Pointer(result))
+	return *cast
+}
+
+func GetError(result *C.mpc_result_t) *C.mpc_err_t {
+	cast := (**C.mpc_err_t)(unsafe.Pointer(result))
+	return *cast
+}
+

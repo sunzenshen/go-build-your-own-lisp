@@ -1,0 +1,21 @@
+typedef struct mpc_ast_t {                              number  : /-?[0-9]+/
+  char *tag;                                            symbol  : /[a-zA-Z0-9_+\-*\/\\=<>!&]+/
+  char *contents;                                       sexpr   : '(' <expr>* ')'
+  mpc_state_t state;                                    expr    : <number> | <symbol> | <sexpr>
+  int children_num;                                     lispy   : /^/ <expr>* /$/
+  struct mpc_ast_t** children;
+} mpc_ast_t;
+
+
+print (+ 1 2)
+
+>
+  regex
+  expr|symbol|regex:1:1 'print'
+  sexpr|>
+    char:1:7 '('
+    expr|symbol|regex:1:8 '+'
+    expr|number|regex:1:10 '1'
+    expr|number|regex:1:12 '2'
+    char:1:13 ')'
+  regex

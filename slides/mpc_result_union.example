@@ -1,0 +1,4 @@
+typedef union {
+  mpc_err_t *error;
+  mpc_val_t *output;
+} mpc_result_t;

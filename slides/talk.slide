@@ -1,0 +1,118 @@
+Cgo(tchas)
+Tags: go golang cgo c
+
+# These are the revised slides for a lightning talk I gave on
+April 9, 2015
+# at the Boulder Gophers meetup.
+# My name is
+Alan Shen
+# and you can find me on Twitter
+@sunzenshen
+
+# These comments aim to provide some context from the verbal component of the presentation,
+# but at the minimum I hope these slides will provide some inspiration for how to organize a "go present" project.
+
+# The "present" tool can be installed by running the following command:
+#   go get code.google.com/p/go.tools/cmd/present
+# (However, this URL may have changed since Google Code has been decommissioned.)
+# Then, these slides can be viewed by running "present" and visiting the local URL displayed.
+
+* Why This Talk?
+.image project_organization.jpg _ 830
+# This talk focused on what I felt were sparsely documented scenarios with Cgo usage.
+# The original inspiration was from when I was working through the book
+# "Build Your Own Lisp" by Daniel Holden,
+# using the Go programming language instead of C.
+# The book made use of a small C library called mpc,
+# which stands for Micro Parsers Combinators,
+# also a creation of the author.
+# While using Cgo to glue together that C code with the rest of my project,
+# I ran into some C language features that were harder to work with than expected.
+
+* AST Generation
+.code ast.example
+# At the start of the talk,
+# I went over an example of how the mpc library worked
+# by briefly describing a simplified grammar definition,
+# the data structure for holding abstract syntax tree nodes
+# and a sample input/output parsing example.
+
+* Getting Started
+# To provide a review for Cgo functionality,
+# I started off with one of the simpler to implement Cgo bindings.
+#
+# The idea was to describe the original C interface:
+- mpc_parser_t *mpc_new(const char *name);
+#
+# ... and to then describe how to access that same C function from Go:
+.code start_easy.example
+
+* C Unions
+.code mpc_result_union.example
+# I started off the C unions example by showing the structure of a union that I had to work with from the project.
+# But instead of immediately showing a solution,
+# I explored some simpler examples to illustrate various properties of C unions in the Go environment.
+
+* C Unions (Example)
+# This slide showed an example C union,
+# where I asked the audience
+- How would you modify this?
+.code unions_start/main.go /START UNION OMIT/,/END UNION OMIT/
+- Let's try some ideas here!
+.play unions_start/main.go /START UNION MAIN OMIT/,/END UNION MAIN OMIT/
+# The above provides an interactive space for writing and running Go code.
+# The main takeaway I wanted to provide here was that
+# a union's contents are not actually members of that data structure.
+
+# I then went over a solution that involved
+* Casting Unsafe Pointers
+.play unions_unsafe_ptr/main.go
+# Then I used the next slide to explain why pointer casting worked as a solution.
+
+# By displaying the
+* Contents and Union Sizes
+# I aimed to demonstrate various properties of the byte array representing a C union.
+.play unions_size/main.go /START UNION OMIT/,/END UNION OMIT/
+- Let's see how these turn out:
+.play unions_size/main.go /START UNION MAIN OMIT/,/END UNION MAIN OMIT/
+# One weakness of this slide was that it did not make it obvious that union sizes are not determined by the number of elements.
+# It was a coincidence that that largest union had the most elements,
+# and this detail could be demonstrated by modifying the double into a smaller type.
+
+# I then returned
+* Back to the Original Example
+.code mpc_result_union.example
+.code mpc_result_solution.example
+# to recap the facts on C unions presented earlier.
+
+# Next was an example of
+* Variadic C Functions
+# where I showed the C interface:
+- mpc_err_t *mpca_lang(int flags, const char *language, ...);
+# I then showed an example of how the function is usually accessed in C:
+.code doge_lang.example
+.caption buildyourownlisp.com/chapter5_languages
+
+* Variadic C Functions (Example)
+.play variadic_guess/main.go
+# Before going into the Go solution, I started with another simplified example.
+# The main takeaway here is that Cgo will not recognize the "..." and generally does not support C variadic functions
+
+* Wrapper Approach
+.play variadic_wrapper/main.go /START VARIADIC OMIT/,/END VARIADIC OMIT/
+# Here I continued with the simplified example that depended on a C wrapper.
+
+# I then returned to the original example:
+* Creating C Wrappers
+.code variadic_wrapper_h.example
+.code variadic_wrapper_go.example
+# The idea was to show how to create a C header file for use in providing wrapper functions.
+# The general takeaway here was on C import behavior and macro guards against multiple definition.
+
+* Demo
+.play demo/main.go /START DEMO OMIT/,/END DEMO OMIT/
+# Finally, I embedded a demo of my Lisp implementation into this presentation.
+# There were several limitations compared to the command line version of the Lisp interpreter:
+# C printing was not displayed in the output window. I suspect that the "fmt" output is being captured in a different way.
+# Cannot load lispy files. The slides did not seem capable of accessing files outside of explicitly imported code.
+

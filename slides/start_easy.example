@@ -1,0 +1,13 @@
+package mpc
+
+// #cgo LDFLAGS: -lm
+// #include "mpc_interface.h"
+import "C"
+
+type MpcParser *C.struct_mpc_parser_t
+
+func MpcNew(name string) MpcParser {
+	cName := C.CString(name)
+	defer C.free(unsafe.Pointer(cName))
+	return C.mpc_new(cName)
+}
