@@ -145,8 +145,8 @@ func MpcParseContents(input string, parser ParserPtr) (*C.mpc_result_t, error) {
 	return result, err
 }
 
-// MpcErrString gets the error string from an mpc result
-func MpcErrString(result *C.mpc_result_t) string {
+// GetErrorStr gets the error string from an mpc result
+func GetErrorStr(result *C.mpc_result_t) string {
 	err := GetError(result)
 	if err == nil {
 		return "<Failed to load error>"

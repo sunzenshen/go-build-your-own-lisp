@@ -274,7 +274,7 @@ func builtinLoad(e *lenv, a *lval) *lval {
 	r, err := mpc.MpcParseContents(a.cells[0].str, e.parser)
 	if err != nil {
 		// Get parse error in string format
-		errMsg := mpc.MpcErrString(r)
+		errMsg := mpc.GetErrorStr(r)
 		ret = lvalErr("Could not load library %s", errMsg)
 	} else if r != nil {
 		// Read contents
