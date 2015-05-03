@@ -11,8 +11,8 @@ import (
 // AstPtr is a pointer to a mpc-generated AST
 type AstPtr *C.mpc_ast_t
 
-// MpcError is a pointer to an mpc error
-type MpcError *C.mpc_err_t
+// ErrorPtr is a pointer to an mpc error
+type ErrorPtr *C.mpc_err_t
 
 // MpcParser is a pointer to a parser created with mpc
 type MpcParser *C.struct_mpc_parser_t
@@ -47,8 +47,8 @@ func GetOutput(result *C.mpc_result_t) AstPtr {
 }
 
 // GetError accesses the error field of an input MpcResult
-func GetError(result *C.mpc_result_t) MpcError {
-	cast := (*MpcError)(unsafe.Pointer(result))
+func GetError(result *C.mpc_result_t) ErrorPtr {
+	cast := (*ErrorPtr)(unsafe.Pointer(result))
 	return *cast
 }
 
