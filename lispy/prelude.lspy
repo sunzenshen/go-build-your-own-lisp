@@ -183,6 +183,20 @@
     {error "Can't find minimum of an empty list!"}
 })
 
+; Find the largest element of the list
+(fun {max l} {
+  if (> (len l) 0)
+    {foldl
+      (\ {running_max candidate}
+        {if (> candidate running_max)
+          {candidate}
+          {running_max}})
+      (fst l)
+      (tail l)
+    }
+    {error "Can't find maximum of an empty list!"}
+})
+
 ; Modulus operator
 (fun {mod n} {
   select

@@ -448,6 +448,10 @@ func TestStandardLibrary(t *testing.T) {
 		{"min {}", "Error: Can't find minimum of an empty list!"},
 		{"min {1 5 3}", "1"},
 		{"min {1 -5 3}", "-5"},
+		// max of list
+		{"max {}", "Error: Can't find maximum of an empty list!"},
+		{"max {1 5 3}", "5"},
+		{"max {1 -5 3}", "3"},
 	}
 
 	for _, c := range cases {
