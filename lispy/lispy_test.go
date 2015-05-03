@@ -503,6 +503,10 @@ func TestPowerOperator(t *testing.T) {
 		{"^ 2 1", "2"},
 		{"^ 2 2", "4"},
 		{"^ 2 3", "8"},
+		{"pow 2 0", "1"},
+		{"pow 2 1", "2"},
+		{"pow 2 2", "4"},
+		{"pow 2 3", "8"},
 	}
 
 	for _, c := range cases {

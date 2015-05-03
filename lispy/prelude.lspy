@@ -181,3 +181,4 @@
 (def {mul} *)
 (def {div} /)
 (def {mod} %)
+(def {pow} ^)
