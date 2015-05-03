@@ -168,3 +168,9 @@
     {otherwise (+ (fib (- n 1))
                   (fib (- n 2)))}
 })
+
+; Textual names for primitive operators
+(def {add} +)
+(def {sub} -)
+(def {mul} *)
+(def {div} /)

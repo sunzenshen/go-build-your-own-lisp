@@ -439,6 +439,11 @@ func TestStandardLibrary(t *testing.T) {
 		{"fib 10", "55"},
 		{"fib 11", "89"},
 		{"fib 12", "144"},
+		// Textual operator names
+		{"add 1 2", "3"},
+		{"sub 1 2", "-1"},
+		{"mul 2 3", "6"},
+		{"div 6 3", "2"},
 	}
 
 	for _, c := range cases {
