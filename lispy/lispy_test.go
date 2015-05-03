@@ -488,3 +488,27 @@ func TestModOperator(t *testing.T) {
 		}
 	}
 }
+
+func TestPowerOperator(t *testing.T) {
+	l := InitLispy()
+	defer CleanLispy(l)
+	l.ReadEval("load \"prelude.lspy\"", false) // Load standard library
+
+	cases := []struct {
+		input string
+		want  string
+	}{
+		// length of list
+		{"^ 2 0", "1"},
+		{"^ 2 1", "2"},
+		{"^ 2 2", "4"},
+		{"^ 2 3", "8"},
+	}
+
+	for _, c := range cases {
+		got := l.ReadEval(c.input, false)
+		if got.lvalString() != c.want {
+			t.Errorf("ReadEval input: \"%s\" returned: \"%s\", actually expected: \"%s\"", c.input, got.lvalString(), c.want)
+		}
+	}
+}

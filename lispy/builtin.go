@@ -1,6 +1,7 @@
 package lispy
 
 import "fmt"
+import "math"
 import "github.com/sunzenshen/go-build-your-own-lisp/mpc"
 
 type lbuiltin func(*lenv, *lval) *lval
@@ -29,6 +30,8 @@ func builtinOp(e *lenv, a *lval, op string) *lval {
 			x.num -= y.num
 		} else if op == "*" {
 			x.num *= y.num
+		} else if op == "^" {
+			x.num = int64(math.Pow(float64(x.num), float64(y.num)))
 		} else if op == "/" {
 			if y.num == 0 {
 				x = lvalErr("Division By Zero!")
@@ -340,4 +343,8 @@ func builtinDiv(e *lenv, a *lval) *lval {
 
 func builtinMod(e *lenv, a *lval) *lval {
 	return builtinOp(e, a, "%")
+}
+
+func builtinPow(e *lenv, a *lval) *lval {
+	return builtinOp(e, a, "^")
 }
