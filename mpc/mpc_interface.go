@@ -94,8 +94,8 @@ func MpcParse(input string, parser ParserPtr) (C.mpc_result_t, error) {
 	return r, err
 }
 
-// MpcErrDelete cleans up the error info in an mpc result
-func MpcErrDelete(result *C.mpc_result_t) {
+// DeleteError cleans up the error info in an mpc result
+func DeleteError(result *C.mpc_result_t) {
 	C.mpc_err_delete(GetError(result))
 }
 
@@ -109,7 +109,7 @@ func PrintAst(input string, mpcParser ParserPtr) {
 	r, err := MpcParse(input, mpcParser)
 	if err != nil {
 		PrintError(&r)
-		MpcErrDelete(&r)
+		DeleteError(&r)
 	} else {
 		C.mpc_ast_print(GetOutput(&r))
 		DeleteAstPtr(&r)
@@ -152,6 +152,6 @@ func GetErrorStr(result *C.mpc_result_t) string {
 		return "<Failed to load error>"
 	}
 	cErrMsg := C.mpc_err_string(err)
-	MpcErrDelete(result)
+	DeleteError(result)
 	return C.GoString(cErrMsg)
 }

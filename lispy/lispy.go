@@ -77,7 +77,7 @@ func (l *Lispy) Read(input string, printErrors bool) *lval {
 		if printErrors {
 			mpc.PrintError(&r)
 		}
-		mpc.MpcErrDelete(&r)
+		mpc.DeleteError(&r)
 		return lvalErr("Failed to parse input: '%s'", input)
 	}
 	defer mpc.DeleteAstPtr(&r)
