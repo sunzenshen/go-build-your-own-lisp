@@ -99,8 +99,8 @@ func MpcErrDelete(result *C.mpc_result_t) {
 	C.mpc_err_delete(GetError(result))
 }
 
-// MpcErrPrint prints the reason for failed AST parsing
-func MpcErrPrint(result *C.mpc_result_t) {
+// PrintError prints the reason for failed AST parsing
+func PrintError(result *C.mpc_result_t) {
 	C.mpc_err_print(GetError(result))
 }
 
@@ -108,7 +108,7 @@ func MpcErrPrint(result *C.mpc_result_t) {
 func PrintAst(input string, mpcParser ParserPtr) {
 	r, err := MpcParse(input, mpcParser)
 	if err != nil {
-		MpcErrPrint(&r)
+		PrintError(&r)
 		MpcErrDelete(&r)
 	} else {
 		C.mpc_ast_print(GetOutput(&r))
