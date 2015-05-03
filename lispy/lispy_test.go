@@ -445,6 +445,7 @@ func TestStandardLibrary(t *testing.T) {
 		{"mul 2 3", "6"},
 		{"div 6 3", "2"},
 		// min of list
+		{"min {}", "Error: Can't find minimum of an empty list!"},
 		{"min {1 5 3}", "1"},
 		{"min {1 -5 3}", "-5"},
 	}

@@ -171,13 +171,16 @@
 
 ; Find the smallest element of the list
 (fun {min l} {
-  foldl
-    (\ {running_min candidate}
-      {if (< candidate running_min)
-        {candidate}
-        {running_min}})
-    (fst l)
-    (tail l)
+  if (> (len l) 0)
+    {foldl
+      (\ {running_min candidate}
+        {if (< candidate running_min)
+          {candidate}
+          {running_min}})
+      (fst l)
+      (tail l)
+    }
+    {error "Can't find minimum of an empty list!"}
 })
 
 ; Modulus operator
