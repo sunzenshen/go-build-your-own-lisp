@@ -169,8 +169,15 @@
                   (fib (- n 2)))}
 })
 
+; Modulus operator
+(fun {mod n} {
+  select
+    {(<)}
+})
+
 ; Textual names for primitive operators
 (def {add} +)
 (def {sub} -)
 (def {mul} *)
 (def {div} /)
+(def {mod} %)

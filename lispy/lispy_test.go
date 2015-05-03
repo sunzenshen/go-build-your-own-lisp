@@ -472,6 +472,13 @@ func TestModOperator(t *testing.T) {
 		{"% -9 3", "0"},
 		{"% 25 -9", "7"},
 		{"% 3 0", "Error: Modulus By Zero!"},
+		{"mod 0 2", "0"},
+		{"mod 1 2", "1"},
+		{"mod 2 2", "0"},
+		{"mod 3 2", "1"},
+		{"mod -9 2", "-1"},
+		{"mod -9 3", "0"},
+		{"mod 25 -9", "7"},
 	}
 
 	for _, c := range cases {
