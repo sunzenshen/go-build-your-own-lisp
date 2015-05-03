@@ -72,7 +72,7 @@ func (l *Lispy) PrintAst(input string) {
 
 // Read takes a string and parses it into an lval
 func (l *Lispy) Read(input string, printErrors bool) *lval {
-	r, err := mpc.MpcParse(input, l.lispyParser)
+	r, err := mpc.ParseString(input, l.lispyParser)
 	if err != nil {
 		if printErrors {
 			mpc.PrintError(&r)

@@ -80,8 +80,8 @@ func MpcNew(name string) ParserPtr {
 	return C.mpc_new(cName)
 }
 
-// MpcParse takes an input string and generates an mpc result
-func MpcParse(input string, parser ParserPtr) (C.mpc_result_t, error) {
+// ParseString takes an input string and generates an mpc result
+func ParseString(input string, parser ParserPtr) (C.mpc_result_t, error) {
 	var r C.mpc_result_t
 	cInput := C.CString(input)
 	defer C.free(unsafe.Pointer(cInput))
@@ -106,7 +106,7 @@ func PrintError(result *C.mpc_result_t) {
 
 // PrintAst parses an input string for its AST representation
 func PrintAst(input string, mpcParser ParserPtr) {
-	r, err := MpcParse(input, mpcParser)
+	r, err := ParseString(input, mpcParser)
 	if err != nil {
 		PrintError(&r)
 		DeleteError(&r)
