@@ -271,7 +271,7 @@ func builtinLoad(e *lenv, a *lval) *lval {
 	}
 	// Parse string as a file name
 	var ret *lval
-	r, err := mpc.MpcParseContents(a.cells[0].str, e.parser)
+	r, err := mpc.ParseContents(a.cells[0].str, e.parser)
 	if err != nil {
 		// Get parse error in string format
 		errMsg := mpc.GetErrorStr(r)

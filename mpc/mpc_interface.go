@@ -132,8 +132,8 @@ func MpcfUnescape(input string) string {
 	return C.GoString((*C.char)(ret))
 }
 
-// MpcParseContents parses the contents of a file
-func MpcParseContents(input string, parser ParserPtr) (*C.mpc_result_t, error) {
+// ParseContents parses the contents of a file
+func ParseContents(input string, parser ParserPtr) (*C.mpc_result_t, error) {
 	cInput := C.CString(input)
 	defer C.free(unsafe.Pointer(cInput))
 	result := new(C.mpc_result_t)
