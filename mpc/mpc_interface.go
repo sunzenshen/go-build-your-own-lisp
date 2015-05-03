@@ -17,9 +17,6 @@ type ErrorPtr *C.mpc_err_t
 // ParserPtr is a pointer to a parser created with mpc
 type ParserPtr *C.struct_mpc_parser_t
 
-// MpcResult is a union that returns either an output or error
-type MpcResult C.mpc_result_t
-
 // GetNumChildren accesses the children_num of AstPtr
 func GetNumChildren(node AstPtr) int {
 	return int(C.get_children_num(node))
@@ -40,13 +37,13 @@ func GetOperator(node AstPtr) string {
 	return GetContents(GetChild(node, 1))
 }
 
-// GetOutput accesses the output field of an input MpcResult
+// GetOutput accesses the output field of an input mpc result
 func GetOutput(result *C.mpc_result_t) AstPtr {
 	cast := (*AstPtr)(unsafe.Pointer(result))
 	return *cast
 }
 
-// GetError accesses the error field of an input MpcResult
+// GetError accesses the error field of an input mpc result
 func GetError(result *C.mpc_result_t) ErrorPtr {
 	cast := (*ErrorPtr)(unsafe.Pointer(result))
 	return *cast
@@ -57,7 +54,7 @@ func GetTag(node AstPtr) string {
 	return C.GoString(node.tag)
 }
 
-// DeleteAstPtr cleans up an AST contained in a MpcResult
+// DeleteAstPtr cleans up an AST contained in a mpc result
 func DeleteAstPtr(result *C.mpc_result_t) {
 	C.mpc_ast_delete(GetOutput(result))
 }
@@ -83,7 +80,7 @@ func MpcNew(name string) ParserPtr {
 	return C.mpc_new(cName)
 }
 
-// MpcParse takes an input string and generates an MpcResult
+// MpcParse takes an input string and generates an mpc result
 func MpcParse(input string, parser ParserPtr) (C.mpc_result_t, error) {
 	var r C.mpc_result_t
 	cInput := C.CString(input)
@@ -97,7 +94,7 @@ func MpcParse(input string, parser ParserPtr) (C.mpc_result_t, error) {
 	return r, err
 }
 
-// MpcErrDelete cleans up the error info in an MpcResult
+// MpcErrDelete cleans up the error info in an mpc result
 func MpcErrDelete(result *C.mpc_result_t) {
 	C.mpc_err_delete(GetError(result))
 }
