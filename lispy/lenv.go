@@ -1,48 +1,42 @@
 package lispy
 
-import "fmt"
 import "github.com/sunzenshen/go-build-your-own-lisp/mpc"
 
 type lenv struct {
 	parser mpc.ParserPtr
 	par    *lenv
-	syms   []string
-	vals   []*lval
+	syms   map[string]*lval
 }
 
 func lenvNew() *lenv {
 	e := new(lenv)
 	e.parser = nil
 	e.par = nil
-	e.syms = nil
-	e.vals = nil
+	e.syms = make(map[string]*lval)
 	return e
 }
 
 func (e *lenv) count() int {
-	if len(e.syms) != len(e.vals) {
-		fmt.Printf("Counts for lenv don't match! syms: %d vals:%d", len(e.syms), len(e.vals))
-		return -1
-	}
 	return len(e.syms)
 }
 
 func lenvCopy(e *lenv) *lenv {
 	n := new(lenv)
+	e.parser = nil
 	n.par = e.par
-	for i := 0; i < e.count(); i++ {
-		n.syms = append(n.syms, string(e.syms[i]))
-		n.vals = append(n.vals, lvalCopy(e.vals[i]))
+	n.syms = make(map[string]*lval)
+	for k, v := range e.syms {
+		n.syms[k] = v
 	}
 	return n
 }
 
 func (e *lenv) lenvGet(k *lval) *lval {
-	for i := 0; i < e.count(); i++ {
-		if e.syms[i] == k.sym {
-			return lvalCopy(e.vals[i])
-		}
+	previous := e.syms[k.sym]
+	if previous != nil {
+		return lvalCopy(previous)
 	}
+
 	// If no symbol is found yet, check in the parent
 	if e.par != nil {
 		return e.par.lenvGet(k)
@@ -52,15 +46,13 @@ func (e *lenv) lenvGet(k *lval) *lval {
 
 func (e *lenv) lenvPut(k, v *lval) {
 	// If existing entry is found, overwrite it
-	for i, sym := range e.syms {
-		if sym == k.sym {
-			e.vals[i] = lvalCopy(v)
-			return
-		}
+	previous := e.syms[k.sym]
+	if previous != nil {
+		e.syms[k.sym] = lvalCopy(v)
+	} else {
+		// If no existing entry is found, add new entry
+		e.syms[k.sym] = v
 	}
-	// If no existing entry is found, add new entry
-	e.vals = append(e.vals, v)
-	e.syms = append(e.syms, k.sym)
 }
 
 func (e *lenv) lenvDef(k *lval, v *lval) {
