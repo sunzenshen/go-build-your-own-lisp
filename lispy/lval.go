@@ -168,7 +168,7 @@ func (v *lval) lvalGetStr() string {
 	return "\"" + escaped + "\""
 }
 
-func lvalReadStr(t mpc.MpcAst) *lval {
+func lvalReadStr(t mpc.AstPtr) *lval {
 	contents := mpc.GetContents(t)
 	unescaped := contents[1 : len(contents)-1] // Cut off quote characters
 	unescaped = mpc.MpcfUnescape(unescaped)
@@ -236,7 +236,7 @@ func (v *lval) lvalExprPrint(openChar string, closeChar string) {
 	fmt.Print(v.lvalExprString(openChar, closeChar))
 }
 
-func lvalReadNum(tree mpc.MpcAst) *lval {
+func lvalReadNum(tree mpc.AstPtr) *lval {
 	x, err := strconv.ParseInt(mpc.GetContents(tree), 10, 0)
 	if err != nil {
 		return lvalErr("Invalid Number: %s", mpc.GetContents(tree))
@@ -244,7 +244,7 @@ func lvalReadNum(tree mpc.MpcAst) *lval {
 	return lvalNum(x)
 }
 
-func lvalRead(tree mpc.MpcAst) *lval {
+func lvalRead(tree mpc.AstPtr) *lval {
 	// If Symbol or Number, return conversion to that type
 	if strings.Contains(mpc.GetTag(tree), "number") {
 		return lvalReadNum(tree)

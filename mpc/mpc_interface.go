@@ -8,8 +8,8 @@ import (
 	"unsafe"
 )
 
-// MpcAst is a pointer to a mpc-generated AST
-type MpcAst *C.mpc_ast_t
+// AstPtr is a pointer to a mpc-generated AST
+type AstPtr *C.mpc_ast_t
 
 // MpcError is a pointer to an mpc error
 type MpcError *C.mpc_err_t
@@ -20,29 +20,29 @@ type MpcParser *C.struct_mpc_parser_t
 // MpcResult is a union that returns either an output or error
 type MpcResult C.mpc_result_t
 
-// GetNumChildren accesses the children_num of MpcAst
-func GetNumChildren(node MpcAst) int {
+// GetNumChildren accesses the children_num of AstPtr
+func GetNumChildren(node AstPtr) int {
 	return int(C.get_children_num(node))
 }
 
-// GetChild accesses the child at a specific index in MpcAst
-func GetChild(node MpcAst, index int) MpcAst {
+// GetChild accesses the child at a specific index in AstPtr
+func GetChild(node AstPtr, index int) AstPtr {
 	return C.get_child(node, C.int(index))
 }
 
-// GetContents accesses the contents of an MpcAst
-func GetContents(node MpcAst) string {
+// GetContents accesses the contents of an AstPtr
+func GetContents(node AstPtr) string {
 	return C.GoString(node.contents)
 }
 
-// GetOperator accesses a MpcAst's child node representing an operator
-func GetOperator(node MpcAst) string {
+// GetOperator accesses a AstPtr's child node representing an operator
+func GetOperator(node AstPtr) string {
 	return GetContents(GetChild(node, 1))
 }
 
 // GetOutput accesses the output field of an input MpcResult
-func GetOutput(result *C.mpc_result_t) MpcAst {
-	cast := (*MpcAst)(unsafe.Pointer(result))
+func GetOutput(result *C.mpc_result_t) AstPtr {
+	cast := (*AstPtr)(unsafe.Pointer(result))
 	return *cast
 }
 
@@ -52,13 +52,13 @@ func GetError(result *C.mpc_result_t) MpcError {
 	return *cast
 }
 
-// GetTag accesses the tag field of an MpcAst
-func GetTag(node MpcAst) string {
+// GetTag accesses the tag field of an AstPtr
+func GetTag(node AstPtr) string {
 	return C.GoString(node.tag)
 }
 
-// MpcAstDelete cleans up an AST contained in a MpcResult
-func MpcAstDelete(result *C.mpc_result_t) {
+// DeleteAstPtr cleans up an AST contained in a MpcResult
+func DeleteAstPtr(result *C.mpc_result_t) {
 	C.mpc_ast_delete(GetOutput(result))
 }
 
@@ -115,7 +115,7 @@ func PrintAst(input string, mpcParser MpcParser) {
 		MpcErrDelete(&r)
 	} else {
 		C.mpc_ast_print(GetOutput(&r))
-		MpcAstDelete(&r)
+		DeleteAstPtr(&r)
 	}
 }
 

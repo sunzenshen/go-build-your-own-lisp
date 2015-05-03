@@ -279,7 +279,7 @@ func builtinLoad(e *lenv, a *lval) *lval {
 	} else if r != nil {
 		// Read contents
 		expr := lvalRead(mpc.GetOutput(r))
-		mpc.MpcAstDelete(r)
+		mpc.DeleteAstPtr(r)
 		// Evaluate each expression
 		for expr.cellCount() > 0 {
 			x := expr.lvalPop(0).lvalEval(e)
