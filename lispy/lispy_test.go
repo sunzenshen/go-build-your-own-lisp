@@ -452,6 +452,10 @@ func TestStandardLibrary(t *testing.T) {
 		{"max {}", "Error: Can't find maximum of an empty list!"},
 		{"max {1 5 3}", "5"},
 		{"max {1 -5 3}", "3"},
+		// cons
+		{"cons 1 {}", "{1}"},
+		{"cons 1 {2}", "{1 2}"},
+		{"cons 1 {2 3}", "{1 2 3}"},
 	}
 
 	for _, c := range cases {

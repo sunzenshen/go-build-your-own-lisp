@@ -197,6 +197,11 @@
     {error "Can't find maximum of an empty list!"}
 })
 
+; Takes a value and appends it in front of a Q-Expression
+(fun {cons x l} {
+  (join (list x) l)
+})
+
 ; Textual names for primitive operators
 (def {add} +)
 (def {sub} -)
