@@ -169,6 +169,17 @@
                   (fib (- n 2)))}
 })
 
+; Find the smallest element of the list
+(fun {min l} {
+  foldl
+    (\ {running_min candidate}
+      {if (< candidate running_min)
+        {candidate}
+        {running_min}})
+    (fst l)
+    (tail l)
+})
+
 ; Modulus operator
 (fun {mod n} {
   select

@@ -444,6 +444,9 @@ func TestStandardLibrary(t *testing.T) {
 		{"sub 1 2", "-1"},
 		{"mul 2 3", "6"},
 		{"div 6 3", "2"},
+		// min of list
+		{"min {1 5 3}", "1"},
+		{"min {1 -5 3}", "-5"},
 	}
 
 	for _, c := range cases {
