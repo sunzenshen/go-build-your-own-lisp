@@ -106,4 +106,5 @@ func (e *lenv) lenvAddBuiltins() {
 	e.lenvAddBuiltin("-", builtinSub)
 	e.lenvAddBuiltin("*", builtinMul)
 	e.lenvAddBuiltin("/", builtinDiv)
+	e.lenvAddBuiltin("%", builtinMod)
 }

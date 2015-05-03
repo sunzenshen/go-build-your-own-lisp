@@ -35,6 +35,12 @@ func builtinOp(e *lenv, a *lval, op string) *lval {
 			} else {
 				x.num /= y.num
 			}
+		} else if op == "%" {
+			if y.num == 0 {
+				x = lvalErr("Modulus By Zero!")
+			} else {
+				x.num %= y.num
+			}
 		}
 	}
 	return x
@@ -330,4 +336,8 @@ func builtinMul(e *lenv, a *lval) *lval {
 
 func builtinDiv(e *lenv, a *lval) *lval {
 	return builtinOp(e, a, "/")
+}
+
+func builtinMod(e *lenv, a *lval) *lval {
+	return builtinOp(e, a, "%")
 }
