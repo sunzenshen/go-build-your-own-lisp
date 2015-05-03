@@ -197,12 +197,6 @@
     {error "Can't find maximum of an empty list!"}
 })
 
-; Modulus operator
-(fun {mod n} {
-  select
-    {(<)}
-})
-
 ; Textual names for primitive operators
 (def {add} +)
 (def {sub} -)
