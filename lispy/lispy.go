@@ -6,14 +6,14 @@ import "github.com/sunzenshen/go-build-your-own-lisp/mpc"
 // Lispy is a collection of the Lispy parser definitions
 type Lispy struct {
 	env           *lenv
-	numberParser  mpc.MpcParser
-	symbolParser  mpc.MpcParser
-	strParser     mpc.MpcParser
-	commentParser mpc.MpcParser
-	sexprParser   mpc.MpcParser
-	qexprParser   mpc.MpcParser
-	exprParser    mpc.MpcParser
-	lispyParser   mpc.MpcParser
+	numberParser  mpc.ParserPtr
+	symbolParser  mpc.ParserPtr
+	strParser     mpc.ParserPtr
+	commentParser mpc.ParserPtr
+	sexprParser   mpc.ParserPtr
+	qexprParser   mpc.ParserPtr
+	exprParser    mpc.ParserPtr
+	lispyParser   mpc.ParserPtr
 }
 
 // CleanLispy is used after parsers initiated by InitLispy are not longer to be used

@@ -14,8 +14,8 @@ type AstPtr *C.mpc_ast_t
 // ErrorPtr is a pointer to an mpc error
 type ErrorPtr *C.mpc_err_t
 
-// MpcParser is a pointer to a parser created with mpc
-type MpcParser *C.struct_mpc_parser_t
+// ParserPtr is a pointer to a parser created with mpc
+type ParserPtr *C.struct_mpc_parser_t
 
 // MpcResult is a union that returns either an output or error
 type MpcResult C.mpc_result_t
@@ -63,7 +63,7 @@ func DeleteAstPtr(result *C.mpc_result_t) {
 }
 
 // MpcaLang uses a language definition to generate parsers
-func MpcaLang(language string, parsers ...MpcParser) {
+func MpcaLang(language string, parsers ...ParserPtr) {
 	cLanguage := C.CString(language)
 	defer C.free(unsafe.Pointer(cLanguage))
 	C.mpca_lang_if(C.MPCA_LANG_DEFAULT, cLanguage,
@@ -71,20 +71,20 @@ func MpcaLang(language string, parsers ...MpcParser) {
 }
 
 // MpcCleanup calls mpc's cleanup function indirectly, using a wrapper for the variadic args
-func MpcCleanup(parsers ...MpcParser) {
+func MpcCleanup(parsers ...ParserPtr) {
 	C.mpc_cleanup_if(C.int(len(parsers)),
 		parsers[0], parsers[1], parsers[2], parsers[3], parsers[4], parsers[5], parsers[6], parsers[7])
 }
 
 // MpcNew returns a pointer to an initiated mpc parser
-func MpcNew(name string) MpcParser {
+func MpcNew(name string) ParserPtr {
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))
 	return C.mpc_new(cName)
 }
 
 // MpcParse takes an input string and generates an MpcResult
-func MpcParse(input string, parser MpcParser) (C.mpc_result_t, error) {
+func MpcParse(input string, parser ParserPtr) (C.mpc_result_t, error) {
 	var r C.mpc_result_t
 	cInput := C.CString(input)
 	defer C.free(unsafe.Pointer(cInput))
@@ -108,7 +108,7 @@ func MpcErrPrint(result *C.mpc_result_t) {
 }
 
 // PrintAst parses an input string for its AST representation
-func PrintAst(input string, mpcParser MpcParser) {
+func PrintAst(input string, mpcParser ParserPtr) {
 	r, err := MpcParse(input, mpcParser)
 	if err != nil {
 		MpcErrPrint(&r)
@@ -136,7 +136,7 @@ func MpcfUnescape(input string) string {
 }
 
 // MpcParseContents parses the contents of a file
-func MpcParseContents(input string, parser MpcParser) (*C.mpc_result_t, error) {
+func MpcParseContents(input string, parser ParserPtr) (*C.mpc_result_t, error) {
 	cInput := C.CString(input)
 	defer C.free(unsafe.Pointer(cInput))
 	result := new(C.mpc_result_t)

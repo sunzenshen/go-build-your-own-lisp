@@ -4,7 +4,7 @@ import "fmt"
 import "github.com/sunzenshen/go-build-your-own-lisp/mpc"
 
 type lenv struct {
-	parser mpc.MpcParser
+	parser mpc.ParserPtr
 	par    *lenv
 	syms   []string
 	vals   []*lval
